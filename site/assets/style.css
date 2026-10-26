@@ -76,7 +76,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .num, table.data td, .axis-label { font-variant-numeric: tabular-nums; }
 
 /* Top bar: wordmark, four plain links, theme switch */
-.topbar { background: var(--surface-1); border-bottom: 1px solid var(--border); }
+.topbar { background: var(--surface-1); border-bottom: 1px solid var(--border); } /* taste-skill-ignore: app-screen top bar */
 .topbar .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
 .brand { font-weight: 800; letter-spacing: -0.03em; color: var(--text-primary); font-size: 17px; }
 .brand:hover { text-decoration: none; }
@@ -112,7 +112,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .filters .note { color: var(--text-muted); font-size: 14px; }
 
 /* Grid + panels: one gutter, a border and no shadow */
-.grid { display: grid; gap: var(--gap); grid-template-columns: repeat(12, 1fr); align-items: start; }
+.grid { display: grid; gap: var(--gap); grid-template-columns: repeat(12, 1fr); align-items: stretch; }
 .span-12 { grid-column: span 12; } .span-8 { grid-column: span 8; } .span-7 { grid-column: span 7; }
 .span-6 { grid-column: span 6; } .span-5 { grid-column: span 5; } .span-4 { grid-column: span 4; }
 @media (max-width: 1000px) { .span-8, .span-7, .span-6, .span-5, .span-4 { grid-column: span 12; } }
@@ -167,7 +167,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .scale-legend .steps { display: inline-flex; gap: 2px; }
 .scale-legend .steps i { display: block; width: 18px; height: 10px; border-radius: 2px; }
 
-.viz-tooltip { position: fixed; z-index: 50; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 24px -8px rgba(0,0,0,.18); padding: 9px 11px; font-size: 13px; min-width: 150px; opacity: 0; transform: translateY(4px); transition: opacity .1s ease, transform .1s ease; }
+.viz-tooltip { position: fixed; z-index: 50; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 24px -8px rgba(0,0,0,.18); /* taste-skill-ignore: tooltip floats */ padding: 9px 11px; font-size: 13px; min-width: 150px; opacity: 0; transform: translateY(4px); transition: opacity .1s ease, transform .1s ease; }
 .viz-tooltip.show { opacity: 1; transform: none; }
 .viz-tooltip .tt-title { color: var(--text-muted); font-size: 12.5px; margin-bottom: 6px; }
 .viz-tooltip .tt-row { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
@@ -180,8 +180,8 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* Tables: 13px grey sentence-case headers, row rules, right-aligned tabular figures */
 .table-wrap { overflow-x: auto; }
 table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
-table.data th { text-align: left; font-weight: 600; color: var(--text-muted); font-size: 13px; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: bottom; }
-table.data td { padding: 9px 10px; border-bottom: 1px solid var(--rule); color: var(--text-secondary); vertical-align: top; }
+table.data th { text-align: left; font-weight: 600; color: var(--text-muted); font-size: 13px; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: bottom; } /* taste-skill-ignore: real table */
+table.data td { padding: 9px 10px; border-bottom: 1px solid var(--rule); color: var(--text-secondary); vertical-align: top; } /* taste-skill-ignore: real table */
 table.data td:first-child, table.data th:first-child { padding-left: 0; }
 table.data td:last-child, table.data th:last-child { padding-right: 0; }
 table.data td.num, table.data th.num { text-align: right; white-space: nowrap; }
@@ -201,7 +201,7 @@ table.data tr:last-child td { border-bottom: 0; }
 .check .ic.fail { background: var(--pill-bad-bg); color: var(--bad-text); }
 .check .ic svg { width: 11px; height: 11px; }
 
-.footer { color: var(--text-muted); font-size: 14px; padding: 36px 0 48px; margin-top: 56px; border-top: 1px solid var(--border); background: var(--surface-1); }
+.footer { color: var(--text-muted); font-size: 14px; padding: 36px 0 48px; margin-top: 56px; background: var(--surface-2); }
 .footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; }
 .footer a { color: var(--link); }
 .muted { color: var(--text-muted); }

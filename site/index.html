@@ -20,14 +20,9 @@
 <body id="top">
   <a class="skip" href="#work">Skip to the work</a>
 
-  <div class="pin-run">
-    <div class="pin-layer" aria-hidden="false">
-      <div class="pin-stick">
-        <h1 class="name"><span class="first">Ahmed</span><span class="second">Kassem</span></h1>
-      </div>
-    </div>
-
     <section class="panel hero" aria-label="Introduction">
+      <h1 class="name first">Ahmed<span class="sr"> Kassem, data engineer</span></h1>
+      <div class="name second" aria-hidden="true">Kassem</div>
       <nav class="site-nav" aria-label="Sections">
         <a href="#work">Work</a><a href="#about">About</a><a href="#contact">Contact</a>
       </nav>
@@ -44,9 +39,9 @@
       </figure>
     </section>
 
-    <section class="panel receipt" id="today" aria-labelledby="today-h">
+    <section class="receipt" id="today" aria-labelledby="today-h">
       <div class="receipt-head rise">
-        <h2 id="today-h">Rebuilt this morning. Checked to the penny.</h2>
+        <h2 id="today-h">Rebuilt this morning, checked to the penny.</h2>
         <p>Every demo below runs again each day at 06:15 UTC. These figures come from today's run, read live from its output.</p>
       </div>
       <div class="ledger" id="ledger">
@@ -57,7 +52,6 @@
       </div>
       <p class="ran-at" id="ran-at"></p>
     </section>
-  </div>
 
   <main id="work">
     <div class="work-head">
@@ -70,7 +64,7 @@
       <div class="pane right"><img src="shots/pane-retail-b.png" width="720" height="900" alt="Monday Report: customer retention by first-purchase month" loading="lazy"></div>
       <div class="seam">
         <div>
-          <h3 id="p1"><span class="half">Monday<br>report</span><span class="half" aria-hidden="true">Monday<br>report</span></h3>
+          <h3 id="p1" data-text="Monday&#10;report"><span class="half">Monday<br>report</span></h3>
           <div class="meta"><strong>E-commerce KPI dashboard</strong>1.07 million real invoice lines · dbt, DuckDB and a pandas reconciliation<br><a class="link" href="retail/">Open the dashboard <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 9h11M10 4.5 14.5 9 10 13.5" stroke="currentColor" stroke-width="2"/></svg></a></div>
         </div>
       </div>
@@ -81,7 +75,7 @@
       <div class="pane right"><img src="shots/pane-email-b.png" width="720" height="900" alt="The number guard tracing each figure in the email" loading="lazy"></div>
       <div class="seam">
         <div>
-          <h3 id="p2"><span class="half">Weekly<br>email</span><span class="half" aria-hidden="true">Weekly<br>email</span></h3>
+          <h3 id="p2" data-text="Weekly&#10;email"><span class="half">Weekly<br>email</span></h3>
           <div class="meta"><strong>AI summary with a number guard</strong>Claude writes it from warehouse facts; every figure is checked before sending<br><a class="link" href="email/">Open the email <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 9h11M10 4.5 14.5 9 10 13.5" stroke="currentColor" stroke-width="2"/></svg></a></div>
         </div>
       </div>
@@ -92,7 +86,7 @@
       <div class="pane right"><img src="shots/pane-spreadsheets-b.png" width="720" height="900" alt="A messy team spreadsheet with its problems highlighted" loading="lazy"></div>
       <div class="seam">
         <div>
-          <h3 id="p3"><span class="half">Spreadsheet<br>rescue</span><span class="half" aria-hidden="true">Spreadsheet<br>rescue</span></h3>
+          <h3 id="p3" data-text="Spreadsheet&#10;rescue"><span class="half">Spreadsheet<br>rescue</span></h3>
           <div class="meta"><strong>Three messy files, one exact table</strong>Text dates, decimal commas, subtotals and duplicates fixed; proven line by line<br><a class="link" href="spreadsheets/">Open the rescue <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 9h11M10 4.5 14.5 9 10 13.5" stroke="currentColor" stroke-width="2"/></svg></a></div>
         </div>
       </div>
@@ -103,7 +97,7 @@
       <div class="pane right"><img src="shots/pane-ops-b.png" width="720" height="900" alt="NYC 311 pipeline: share of requests closed within 24 hours" loading="lazy"></div>
       <div class="seam">
         <div>
-          <h3 id="p4"><span class="half">NYC<br>311</span><span class="half" aria-hidden="true">NYC<br>311</span></h3>
+          <h3 id="p4" data-text="NYC&#10;311"><span class="half">NYC<br>311</span></h3>
           <div class="meta"><strong>A live pipeline on open data</strong>Incremental loads, upserts, freshness and volume tests, every morning<br><a class="link" href="ops/">Open the pipeline <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 9h11M10 4.5 14.5 9 10 13.5" stroke="currentColor" stroke-width="2"/></svg></a></div>
         </div>
       </div>
@@ -138,7 +132,7 @@
     <h2 id="contact-h">Tell me where your numbers live and the three you check every week.</h2>
     <span></span>
     <a class="big" id="contact-line" href="https://github.com/ahmedkkassem">github.com/ahmedkkassem</a>
-    <div class="corners"><span>Based in Egypt. Working in English, Arabic and German.</span><span id="contact-links"><a href="https://github.com/ahmedkkassem/data-portfolio">Code</a></span></div>
+    <div class="corners"><span>Based in Egypt. Working in English, Arabic and German.</span><span id="contact-links"></span></div>
   </section>
 
   <footer class="site-footer">

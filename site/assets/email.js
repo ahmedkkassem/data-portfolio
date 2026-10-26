@@ -66,7 +66,7 @@ html("h3", { style: "font-size:16px;margin:4px 0 4px" }, g, "Number guard");
 html("p", { class: "small muted", style: "margin:0 0 12px" }, g, "Each figure in the email, and the warehouse fact it must equal after rounding.");
 const t = html("table", { class: "data" }, html("div", { class: "table-wrap" }, g));
 const hr = html("tr", {}, html("thead", {}, t));
-html("th", {}, hr, "In the text");
+html("th", { class: "num" }, hr, "In the text");
 html("th", {}, hr, "Matches");
 const tb = html("tbody", {}, t);
 const pretty = (k) => k.replace(/_/g, " ").replace(/^this week\./, "this week: ").replace(/^last week\./, "last week: ")
@@ -77,7 +77,7 @@ for (const r of guard.results) {
   if (seen.has(r.number)) continue;
   seen.add(r.number);
   const tr = html("tr", {}, tb);
-  const n = html("td", {}, tr);
+  const n = html("td", { class: "num" }, tr);
   html("span", { class: "trace-num" }, n, r.number);
   const m = html("td", {}, tr);
   const st = html("span", { class: `status ${r.ok ? "ok" : "bad"}`, style: "margin-right:6px" }, m);

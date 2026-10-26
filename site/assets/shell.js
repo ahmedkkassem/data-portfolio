@@ -62,7 +62,9 @@ export function reveal(selector = ".card, .kpi-strip, .proofline") {
   // headless screenshots: ?shot=<element id> scrolls there and shows everything at once
   const shot = new URLSearchParams(location.search).get("shot");
   if (shot) {
-    els.forEach((el) => el.classList.add("in"));
-    document.getElementById(shot)?.scrollIntoView();
+    els.forEach((el) => { el.classList.add("in"); el.style.transition = "none"; });
+    document.documentElement.style.scrollBehavior = "auto";
+    const target = document.getElementById(shot);
+    if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 16, behavior: "instant" });
   }
 }

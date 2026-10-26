@@ -27,6 +27,38 @@ if (CONTACT.email) {
   line.href = CONTACT.upwork; line.textContent = "Hire me on Upwork";
 }
 
+// entrances first, so nothing waits on the data: each part rises once as it enters; visible without script
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("shot");
+const rise = [...document.querySelectorAll(".rise")];
+let ledgerSeen = false;
+const startCounters = () => document.querySelectorAll("#ledger b[data-target]").forEach((el) => { if (!el.dataset.done) { el.dataset.done = "1"; count(el); } });
+if ("IntersectionObserver" in window && !reduce) {
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      e.target.classList.add("in");
+      if (e.target.closest("#ledger")) { ledgerSeen = true; startCounters(); }
+      io.unobserve(e.target);
+    }
+  }, { rootMargin: "0px 0px -10% 0px" });
+  rise.forEach((el) => {
+    const sib = [...el.parentElement.children].filter((c) => c.classList.contains("rise"));
+    el.style.transitionDelay = `${sib.indexOf(el) * 80}ms`;
+    io.observe(el);
+  });
+} else {
+  rise.forEach((el) => el.classList.add("in"));
+}
+function count(el) {
+  const target = +el.dataset.target, t0 = performance.now(), dur = 1100;
+  const step = (t) => {
+    const k = Math.min(1, (t - t0) / dur), e = 1 - (1 - k) ** 3;
+    el.textContent = el._fmt(k < 1 ? Math.floor(target * e) : target);
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 // today's run: read from the same JSON the dashboards use
 const get = (p) => fetch(p).then((r) => (r.ok ? r.json() : null)).catch(() => null);
 const [ops, retail, recon, guard] = await Promise.all([
@@ -38,7 +70,6 @@ const values = {
   sheets: recon && { n: recon.mismatched_lines, text: (v) => int(v), sub: `of ${int(recon.rows.reduce((s, r) => s + r.rebuilt_lines, 0))} rebuilt spreadsheet lines differ from the source` },
   guard: guard && { n: guard.results.filter((r) => r.ok).length, text: (v) => `${int(v)} of ${guard.numbers_checked}` },
 };
-const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("shot");
 for (const el of document.querySelectorAll("#ledger b[data-k]")) {
   const v = values[el.dataset.k];
   if (!v) { el.textContent = "—"; continue; }
@@ -55,33 +86,7 @@ if (ops) {
   document.getElementById("ran-at").textContent =
     `Last run ${longDate(ops.generated_at)} at ${ops.generated_at.slice(11, 16)} UTC, ${r.mode} mode, ${tests} of ${ops.tests.length} pipeline tests passed.`;
 }
-const counters = [...document.querySelectorAll("#ledger b[data-target]")];
-const count = (el) => {
-  const target = +el.dataset.target, t0 = performance.now(), dur = 1100;
-  const step = (t) => {
-    const k = Math.min(1, (t - t0) / dur), e = 1 - (1 - k) ** 3;
-    el.textContent = el._fmt(k < 1 ? Math.floor(target * e) : target);
-    if (k < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-};
-
-// entrances: each part rises once as it enters; content is visible without script
-const rise = [...document.querySelectorAll(".rise")];
-if ("IntersectionObserver" in window && !reduce) {
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (!e.isIntersecting) continue;
-      e.target.classList.add("in");
-      e.target.querySelectorAll?.("b[data-target]").forEach(count);
-      io.unobserve(e.target);
-    }
-  }, { rootMargin: "0px 0px -10% 0px" });
-  rise.forEach((el, i) => { el.style.transitionDelay = `${(i % 4) * 80}ms`; io.observe(el); });
-} else {
-  rise.forEach((el) => el.classList.add("in"));
-  counters.forEach((el) => { el.textContent = el._fmt(+el.dataset.target); });
-}
+if (ledgerSeen || reduce || !("IntersectionObserver" in window)) document.querySelectorAll("#ledger b[data-target]").forEach((el) => (reduce ? (el.textContent = el._fmt(+el.dataset.target)) : count(el)));
 
 // the stack band loops seamlessly: duplicate its names once
 const track = document.getElementById("track");
