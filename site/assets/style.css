@@ -1,4 +1,4 @@
-/* Dashboard screens. App-screen rules: one grotesk, a quiet border OR a tone step (never a shadow at rest),
+/* Dashboard screens. App-screen rules: one grotesk, a quiet border or a tone step to separate surfaces,
    one radius, labels in sentence case, the accent on the data only, tabular figures in columns.
    Palette: navy ink on white (shared with the home page); data hue from the validated chart palette. */
 :root {
@@ -111,7 +111,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .seg button[aria-pressed="true"] { background: var(--surface-1); color: var(--text-primary); }
 .filters .note { color: var(--text-muted); font-size: 14px; }
 
-/* Grid + panels: one gutter, a border and no shadow */
+/* Grid + panels: one gutter, quiet borders */
 .grid { display: grid; gap: var(--gap); grid-template-columns: repeat(12, 1fr); align-items: stretch; }
 .span-12 { grid-column: span 12; } .span-8 { grid-column: span 8; } .span-7 { grid-column: span 7; }
 .span-6 { grid-column: span 6; } .span-5 { grid-column: span 5; } .span-4 { grid-column: span 4; }
