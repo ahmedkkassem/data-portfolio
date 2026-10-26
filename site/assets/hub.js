@@ -37,7 +37,7 @@ const grid = document.getElementById("projects");
 for (const p of projects) {
   const c = html("article", { class: "card project" }, grid);
   const a = html("a", { class: "shot", href: p.href, "aria-label": `Open ${p.title}` }, c);
-  html("img", { src: p.img, alt: `Screenshot of ${p.title}`, loading: "lazy" }, a);
+  html("img", { src: p.img, alt: `Screenshot of ${p.title}` }, a);
   const b = html("div", { class: "body" }, c);
   html("div", { class: "num" }, b, `Demo ${p.n}`);
   html("h2", {}, b, p.title);
