@@ -31,7 +31,7 @@ def fetch_page(where: str, offset: int) -> list[dict]:
     url = f"{API}?{urllib.parse.urlencode(params)}"
     for attempt in range(5):
         try:
-            with urllib.request.urlopen(url, timeout=120) as resp:
+            with urllib.request.urlopen(url, timeout=90) as resp:
                 return json.loads(resp.read())
         except Exception as exc:  # network hiccup or throttling: back off and retry
             if attempt == 4:
@@ -49,6 +49,7 @@ def fetch_day(where: str, day: dt.date) -> list[dict]:
         page = fetch_page(day_where, offset)
         rows.extend(page)
         if len(page) < PAGE:
+            print(f"  {day}: {len(rows):,} rows", flush=True)
             return rows
         offset += PAGE
 
