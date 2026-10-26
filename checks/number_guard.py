@@ -5,13 +5,14 @@ some fact (or a change/difference/share between two facts) rounds to exactly wha
 One untraceable number fails the build, so an AI-written summary can never publish a made-up figure.
 """
 import json
+import os
 import pathlib
 import re
 import sys
 
-FACTS = json.loads(pathlib.Path("build/site/data/report_week.json").read_text())
-SUMMARY = json.loads(pathlib.Path("site/email/summary.json").read_text())
-OUT = pathlib.Path("build/checks/number_guard.json")
+FACTS = json.loads(pathlib.Path(os.environ.get("GUARD_FACTS", "build/site/data/report_week.json")).read_text())
+SUMMARY = json.loads(pathlib.Path(os.environ.get("GUARD_SUMMARY", "site/email/summary.json")).read_text())
+OUT = pathlib.Path(os.environ.get("GUARD_OUT", "build/checks/number_guard.json"))
 
 MONTHS = "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec"
 TOKEN = re.compile(r"(?P<cur>£)?(?P<num>\d(?:[\d,]*\d)?(?:\.\d+)?)(?P<scale>[KM])?(?P<unit>%| pts)?")

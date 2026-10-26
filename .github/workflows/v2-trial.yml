@@ -1,0 +1,51 @@
+name: v2 trial (one-off)
+# Checks the parts of portfolio v2 that need no accounts: the order replay plan, and a free model on
+# GitHub Models writing the weekly summary, with the number guard on its output.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  models: read
+jobs:
+  trial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install duckdb pandas openpyxl pyarrow
+      - uses: actions/cache@v4
+        with:
+          path: data/raw/retail
+          key: retail-raw-v1
+      - run: python pipelines/retail/extract.py
+      - name: Replay plan (dry run)
+        run: |
+          python pipelines/shop/replay.py --dry-run | tee replay.txt
+          python pipelines/shop/replay.py --dry-run --day 2026-11-29 | tail -1 | tee -a replay.txt
+      - name: Models on offer (free tier)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://models.github.ai/catalog/models \
+            | python -c "import json,sys; [print(m['id'], '|', m.get('rate_limit_tier')) for m in json.load(sys.stdin)]" | tee models.txt
+      - name: Free model writes the summary; the number guard checks it
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p trial
+          curl -sf https://ahmedkkassem.github.io/data-portfolio/data/report_week.json -o trial/facts.json
+          python pipelines/summary/generate_free.py trial/facts.json trial/summary.json | tee trial/generate.txt
+          GUARD_FACTS=trial/facts.json GUARD_SUMMARY=trial/summary.json GUARD_OUT=trial/guard.json \
+            python checks/number_guard.py | tee trial/guard.txt || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v2-trial
+          path: |
+            replay.txt
+            models.txt
+            build/shop/
+            trial/
