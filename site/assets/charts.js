@@ -269,7 +269,9 @@ export function barChart(el, opts) {
       const w = (Math.max(0, d.value) / max) * iw;
       const g = svg("g", { class: "mark", tabindex: 0 }, root);
       svg("rect", { x: 0, y: i * rowHeight, width: W, height: rowHeight, fill: "transparent" }, g);
-      const lbl = d.label.length > 34 ? d.label.slice(0, 33) + "…" : d.label;
+      // shorten the label to the space it has (the tooltip and table keep the full name)
+      let lbl = d.label;
+      while (lbl.length > 4 && measure(root, lbl, "cat-label") > labelW - 12) lbl = lbl.slice(0, -2).trimEnd() + "…";
       txt(g, x0 - 10, y + bh / 2 + 4, lbl, "cat-label", "end");
       svg("path", { d: hBarPath(x0, y, Math.max(w, 1.5), bh), fill: d.color || color }, g);
       txt(g, x0 + w + 7, y + bh / 2 + 4, format(d.value), "val-label");
