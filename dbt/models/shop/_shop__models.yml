@@ -1,0 +1,46 @@
+version: 2
+
+sources:
+  - name: shop_raw
+    description: The shop's order-line export, loaded in full each morning (BigQuery target only).
+    schema: shop_raw
+    tables:
+      - name: order_lines
+
+models:
+  - name: stg_shop__order_lines
+    description: One row per order line (sales positive, returns negative), typed, with order date and week.
+    columns:
+      - name: order_id
+        data_tests: [not_null]
+      - name: order_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [sale, return]
+      - name: line_total
+        data_tests: [not_null]
+  - name: dim_shop_customers
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+  - name: mart_shop_daily
+    description: One row per calendar day, including days with no orders.
+    columns:
+      - name: day
+        data_tests: [unique, not_null]
+  - name: mart_shop_weekly
+    description: One row per Monday-to-Sunday week, with the same week a year earlier alongside.
+    columns:
+      - name: week_start
+        data_tests: [unique, not_null]
+  - name: mart_shop_products_weekly
+    data_tests:
+      - dbt_utils_free_unique_combination:
+          arguments:
+            columns: [week_start, sku]
+  - name: mart_shop_countries_weekly
+    data_tests:
+      - dbt_utils_free_unique_combination:
+          arguments:
+            columns: [week_start, country]

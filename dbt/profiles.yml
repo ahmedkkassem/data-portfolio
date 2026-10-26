@@ -5,3 +5,10 @@ portfolio:
       type: duckdb
       path: dbt/warehouse.duckdb  # relative to the repo root, where dbt runs
       threads: 4
+    bq:  # the demo shop on BigQuery (free sandbox); credentials come from Workload Identity Federation
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('BQ_PROJECT', 'unset') }}"
+      dataset: shop
+      location: "{{ env_var('BQ_LOCATION', 'US') }}"
+      threads: 4

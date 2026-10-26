@@ -1,0 +1,88 @@
+name: live shop
+# The simulated live shop, every morning: yesterday's orders arrive, the warehouse is rebuilt and tested,
+# an anomaly check runs, and on Mondays the AI email is written, checked by the number guard and sent.
+# BigQuery is used once the repository variables BQ_PROJECT, WIF_PROVIDER and WIF_SERVICE_ACCOUNT exist;
+# until then the same dbt models run on DuckDB.
+on:
+  schedule:
+    - cron: "30 5 * * *"   # daily 05:30 UTC, before the site build
+  workflow_dispatch:
+    inputs:
+      weekly:
+        description: "Write and send the weekly email now, even if it is not Monday"
+        type: boolean
+        default: false
+permissions:
+  contents: write
+  id-token: write
+concurrency:
+  group: shop
+  cancel-in-progress: false
+jobs:
+  shop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BQ_PROJECT: ${{ vars.BQ_PROJECT }}
+      BQ_LOCATION: ${{ vars.BQ_LOCATION || 'US' }}
+      ENGINE: ${{ vars.BQ_PROJECT && 'bigquery' || 'duckdb' }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -r requirements.txt dbt-bigquery google-cloud-bigquery
+      - uses: actions/cache@v4
+        with:
+          path: data/raw/retail
+          key: retail-raw-v1
+      - name: Source file
+        run: python pipelines/retail/extract.py
+      - name: The shop's order export, up to the end of yesterday
+        run: python pipelines/shop/replay.py
+      - name: Sign in to Google Cloud (no key file)
+        if: env.ENGINE == 'bigquery'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+      - name: Load into BigQuery
+        if: env.ENGINE == 'bigquery'
+        run: python pipelines/shop/load_bigquery.py
+      - name: Transform + test (dbt)
+        run: |
+          dbt build --project-dir dbt --profiles-dir dbt --select tag:shop --target ${{ env.ENGINE == 'bigquery' && 'bq' || 'ci' }}
+          cp dbt/target/run_results.json data/shop/run_results.json
+      - name: Weekly facts and the anomaly check
+        run: python pipelines/shop/facts.py $ENGINE data/shop
+      - name: Restore the email archive
+        run: gh release download shop-state -p '*.json' -D state || echo "no archive yet"
+      - name: Anomaly alert (sent once per day, only when something is off)
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python pipelines/shop/send_email.py alert data/shop/shop_anomaly.json state
+      - name: Monday email (written by a free model, checked by the number guard, then sent)
+        if: github.event_name == 'schedule' || inputs.weekly
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          FORCE: ${{ inputs.weekly && 'true' || 'false' }}
+        run: bash pipelines/shop/weekly.sh
+      - name: Save the archive and today's facts
+        run: |
+          cp data/shop/shop_week.json data/shop/shop_anomaly.json data/shop/manifest.json state/ 2>/dev/null || true
+          gh release view shop-state >/dev/null 2>&1 || gh release create shop-state --title "Live shop state" \
+            --notes "Machine-written state for the simulated live shop (email archive, alerts, latest facts). Not a software release."
+          gh release upload shop-state state/*.json --clobber
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shop
+          path: |
+            data/shop/*.json
+            state/

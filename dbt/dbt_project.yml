@@ -20,6 +20,8 @@ models:
       +tags: [sheets]
     nyc311:
       +tags: [nyc311]
+    shop:
+      +tags: [shop]
 
 seeds:
   portfolio:

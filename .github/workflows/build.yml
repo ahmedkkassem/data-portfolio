@@ -35,7 +35,7 @@ jobs:
         working-directory: .
         run: |
           dbt deps --project-dir dbt --profiles-dir dbt || true
-          dbt build --project-dir dbt --profiles-dir dbt --exclude tag:sheets tag:nyc311
+          dbt build --project-dir dbt --profiles-dir dbt --exclude tag:sheets tag:nyc311 tag:shop
       - name: Independent reconciliation
         run: python checks/reconcile_retail.py
       - name: Export dashboard data
