@@ -14,7 +14,10 @@ daily as (
 select
     spine.day,
     coalesce(daily.requests, 0) as requests,
-    avg(coalesce(daily.requests, 0)) over (order by spine.day rows between 6 preceding and current row) as requests_7d_avg,
+    -- only once a full 7 days exist, so the first days of the window don't show a partial average
+    case when count(*) over (order by spine.day rows between 6 preceding and current row) = 7
+        then avg(coalesce(daily.requests, 0)) over (order by spine.day rows between 6 preceding and current row)
+    end as requests_7d_avg,
     case when spine.day <= b.last_mature_day then daily.closed_within_24h / daily.requests end as closed_within_24h_rate
 from spine
 cross join b

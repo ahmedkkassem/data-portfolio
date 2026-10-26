@@ -30,7 +30,7 @@ chip(chips, `${fmtInt(d.quality.requests_in_window)} requests in the 90-day wind
 const cur = d.kpis.current, prev = d.kpis.previous;
 const daily = d.daily, last28 = daily.slice(-28);
 const kpis = document.getElementById("kpis");
-statTile(kpis, { label: "Requests, last 7 days", value: fmtInt(cur.requests), delta: deltaPct(cur.requests, prev.requests, false), vs: " vs previous 7 days",
+statTile(kpis, { label: "Requests, last 7 days", value: fmtInt(cur.requests), delta: { ...deltaPct(cur.requests, prev.requests, true), good: null }, vs: " vs previous 7 days",
   spark: last28.map((x) => x.requests) });
 statTile(kpis, { label: "Closed within 24 hours", value: fmtPct(cur.closed_within_24h_rate, 1),
   delta: deltaPts(cur.closed_within_24h_rate, prev.closed_within_24h_rate, true), vs: " vs previous 7 days",
@@ -63,7 +63,7 @@ barChart(c2.plot, { items: d.agencies.slice(0, 8).map((a) => ({ label: agencyNam
 
 // mix
 const rowM = document.getElementById("row-mix");
-const c3 = card(rowM, { title: "Top 10 complaint types", sub: "Requests by type", spanClass: "span-6",
+const c3 = card(rowM, { title: "Top 10 complaint types", sub: "Requests by type", spanClass: "span-5",
   table: { columns: [{ key: "complaint_type", label: "Type", format: titleCase }, { key: "requests", label: "Total", num: true, format: fmtInt },
     { key: "bronx", label: "Bronx", num: true, format: fmtInt }, { key: "brooklyn", label: "Brooklyn", num: true, format: fmtInt },
     { key: "manhattan", label: "Manhattan", num: true, format: fmtInt }, { key: "queens", label: "Queens", num: true, format: fmtInt },
@@ -73,14 +73,14 @@ barChart(c3.plot, {
   tipRows: ({ c }) => [{ name: "Requests", value: fmtInt(c.requests) },
     ...["brooklyn", "queens", "bronx", "manhattan", "staten_island"].map((b) => ({ name: titleCase(b.replace("_", " ")), value: fmtInt(c[b]) }))],
 });
-const c4 = card(rowM, { title: "Agency performance", sub: "Close times on mature days; open = not yet closed", spanClass: "span-6" });
+const c4 = card(rowM, { title: "Agency performance", sub: "Close times on mature days; open = not yet closed", spanClass: "span-7" });
 c4.plot.remove();
 renderTable(html("div", { class: "table-wrap" }, c4.card), {
   columns: [
     { key: "agency", label: "Agency", format: agencyName },
     { key: "requests_28d", label: "Requests", num: true, format: fmtInt },
     { key: "closed_within_24h_rate", label: "Closed ≤ 24 h", num: true, format: (v) => (v == null ? "—" : fmtPct(v, 0)) },
-    { key: "median_hours_to_close", label: "Median hours", num: true, format: (v) => (v == null ? "—" : fmtNum(v, 1)) },
+    { key: "median_hours_to_close", label: "Median hours", num: true, format: (v) => (v == null ? "—" : v < 0.05 ? "< 0.1" : fmtNum(v, 1)) },
     { key: "open_now", label: "Open now", num: true, format: fmtInt },
   ],
   rows: d.agencies.slice(0, 10),
