@@ -1,0 +1,26 @@
+name: profile (one-off)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [tools/profile_retail.py, pipelines/retail/extract.py, .github/workflows/profile.yml]
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install duckdb pandas openpyxl pyarrow tabulate
+      - uses: actions/cache@v4
+        with:
+          path: data/raw/retail
+          key: retail-raw-v1
+      - run: python pipelines/retail/extract.py
+      - run: python tools/profile_retail.py | tee profile.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: profile
+          path: profile.md
