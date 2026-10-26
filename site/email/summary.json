@@ -12,5 +12,5 @@
     "New customers: only 31 this week, down from 37 last week and 54 in the same week last year. Worth checking acquisition before the Christmas peak.",
     "France grew to £7,465 from £4,481, and Japan ordered £3,652 after a week with no orders. Two markets to keep an eye on."
   ],
-  "written_by": "Claude (Anthropic), from build/site/data/report_week.json; every number checked by checks/number_guard.py"
+  "written_by": "Claude (Anthropic) from this week's facts file, then checked by the number guard"
 }

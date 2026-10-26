@@ -3,71 +3,65 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Live Ops Pipeline</title>
-  <meta name="description" content="A self-refreshing pipeline on live NYC 311 data: incremental loads, upserts, tests and freshness checks every morning.">
+  <title>NYC 311 Pipeline</title>
+  <meta name="description" content="A pipeline on live NYC open data that refreshes itself every morning, with tests and freshness checks.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="NYC 311 Pipeline">
+  <meta property="og:description" content="A pipeline on live NYC open data that refreshes itself every morning, with tests and freshness checks.">
+  <meta property="og:image" content="https://ahmedkkassem.github.io/data-portfolio/shots/ops-og.png">
+  <meta property="og:url" content="https://ahmedkkassem.github.io/data-portfolio/ops/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="wrap">
-      <a class="brand" href="../"><span class="brand-mark"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 11V7M7 11V3M12 11V5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>Ahmed Kassem · Data</a>
-      <nav class="topnav" aria-label="Demos">
-        <a href="../retail/">Monday Report</a>
-        <a href="../email/">AI weekly email</a>
-        <a href="../spreadsheets/">Spreadsheet rescue</a>
-        <a href="../ops/" aria-current="page">Live ops pipeline</a>
-      </nav>
-      <button class="theme-toggle" type="button" id="theme"></button>
-    </div>
-  </header>
+  <div id="topbar"></div>
 
   <main class="wrap">
-    <div class="page-head">
-      <p class="eyebrow">Demo 4 · Live operations pipeline</p>
-      <h1>NYC 311: a pipeline that refreshes itself every morning</h1>
-      <p class="lede">Every day at 06:15 UTC, GitHub Actions pulls only the New York City service requests that changed since the last run. It updates a 90-day window, rebuilds the models, runs the tests and republishes this page. There's no server and no manual step, and a request that gets closed days later is updated, not missed.</p>
-      <div class="meta-row" id="chips"></div>
+    <div class="title-row">
+      <div>
+        <h1>NYC 311 live pipeline</h1>
+        <p class="title-sub">Every morning at 06:15 UTC, GitHub Actions fetches only the New York City service requests that changed since the last run, updates a 90-day window, rebuilds the models, runs the tests and republishes this page. No server, no manual step.</p>
+      </div>
+      <div class="stamp" id="stamp"></div>
     </div>
+    <div class="proofline" id="proofline"></div>
 
-    <section class="kpis four" id="kpis" aria-label="Headline numbers"></section>
+    <section id="kpis" aria-label="Headline numbers"></section>
 
-    <div class="section-title"><h2>Demand</h2><p id="demand-note"></p></div>
+    <div class="section-head"><h2>Demand</h2><p id="demand-note"></p></div>
     <div class="grid" id="row-demand"></div>
 
-    <div class="section-title"><h2>What people report, and who answers</h2><p>Last 28 complete days</p></div>
+    <div class="section-head"><h2>What people report, and who answers</h2><p>Last 28 complete days</p></div>
     <div class="grid" id="row-mix"></div>
 
-    <div class="section-title"><h2>Speed</h2><p>Timing is measured only on days old enough for every request to have had its full 24 hours</p></div>
+    <div class="section-head"><h2>Speed</h2><p>Measured only on days old enough for every request to have had its full 24 hours</p></div>
     <div class="grid" id="row-speed"></div>
 
-    <div class="section-title"><h2>The pipeline itself</h2><p>Every run is logged; tests decide whether new data is published</p></div>
+    <div class="section-head"><h2>The pipeline itself</h2><p>Every run is logged; the tests decide whether new data is published</p></div>
     <div class="grid" id="row-pipeline"></div>
 
-    <div class="section-title"><h2>How it's built</h2><p>Free to run: GitHub Actions + GitHub Pages</p></div>
-    <section class="card">
-      <div class="flow">
-        <div class="step"><div class="k">Source</div><div class="t">NYC Open Data API</div><div class="d">311 requests, about 10,000 a day, updated continuously</div></div>
-        <div class="arrow">→</div>
-        <div class="step"><div class="k">Extract</div><div class="t">Incremental</div><div class="d">Only rows changed since the last high-water mark</div></div>
-        <div class="arrow">→</div>
-        <div class="step"><div class="k">Load</div><div class="t">Upsert</div><div class="d">Insert-or-replace by request ID into a 90-day window; state kept as Parquet</div></div>
-        <div class="arrow">→</div>
-        <div class="step"><div class="k">Transform + test</div><div class="t">dbt</div><div class="d">Models, schema tests, gap and volume checks, source freshness</div></div>
-        <div class="arrow">→</div>
-        <div class="step"><div class="k">Publish</div><div class="t">This page</div><div class="d">Only if the tests pass; otherwise yesterday's page stays up</div></div>
+    <div class="section-head"><h2>How it's built</h2><p>Free to run on GitHub Actions and GitHub Pages</p></div>
+    <section class="card" id="built">
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Step</th><th>Tool</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Extract</strong></td><td>Python, NYC Open Data API</td><td>Fetches only requests changed since the last high-water mark, one day at a time, six days in parallel</td></tr>
+            <tr><td><strong>Load</strong></td><td>DuckDB</td><td>Upserts by request ID into a rolling 90-day window, so a request closed days later is updated, not missed; state kept as Parquet between runs</td></tr>
+            <tr><td><strong>Transform + test</strong></td><td>dbt</td><td>Models, unique keys, no empty days, a volume check against the 28-day median, and source freshness</td></tr>
+            <tr><td><strong>Publish</strong></td><td>GitHub Pages</td><td>Only when every test passes; otherwise yesterday's page stays up and the state is not overwritten</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="wrap">
-      <span>Demo on public data by Ahmed Kassem. Not affiliated with the City of New York.</span>
-      <span>Data: <a href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9">NYC 311 Service Requests</a>, NYC Open Data. · <a href="https://github.com/ahmedkkassem/data-portfolio">Source code</a></span>
-    </div>
-  </footer>
+  <div id="footer"></div>
+  <p id="credit" hidden>Data: <a href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9">NYC 311 Service Requests</a>, NYC Open Data. Not affiliated with the City of New York. · <a href="https://github.com/ahmedkkassem/data-portfolio">Source code</a></p>
   <script type="module" src="../assets/ops.js"></script>
 </body>
 </html>

@@ -3,103 +3,93 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Weekly Email</title>
-  <meta name="description" content="The Monday Report email: an AI-written weekly summary where every number is verified against the data warehouse.">
+  <title>Weekly AI Email</title>
+  <meta name="description" content="A weekly summary written by AI from warehouse facts, with every number checked before it is sent.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Weekly AI Email">
+  <meta property="og:description" content="A weekly summary written by AI from warehouse facts, with every number checked before it is sent.">
+  <meta property="og:image" content="https://ahmedkkassem.github.io/data-portfolio/shots/email-og.png">
+  <meta property="og:url" content="https://ahmedkkassem.github.io/data-portfolio/email/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/style.css">
   <style>
-    .mail-shell { max-width: 760px; margin: 0 auto; }
-    .mail-meta { padding: 16px 22px; border-bottom: 1px solid var(--border); display: grid; gap: 4px; font-size: 13.5px; color: var(--text-secondary); }
+    .mail-meta { padding: 16px 20px; border-bottom: 1px solid var(--border); display: grid; gap: 4px; font-size: 14px; color: var(--text-secondary); }
     .mail-meta b { color: var(--text-primary); font-weight: 600; }
-    .mail-subject { font-size: 19px; font-weight: 650; color: var(--text-primary); letter-spacing: -0.01em; margin-bottom: 4px; }
-    .mail-body { padding: 24px 26px 28px; }
-    .mail-body h2 { font-size: 22px; letter-spacing: -0.02em; margin: 0 0 18px; line-height: 1.3; }
-    .mail-body h3 { margin: 26px 0 10px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
-    .mail-body ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; color: var(--text-secondary); }
+    .mail-subject { font-size: 18px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.015em; line-height: 1.3; }
+    .mail-body { padding: 22px 20px 24px; }
+    .mail-lead { font-size: 21px; line-height: 1.35; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 18px; max-width: 34em; }
+    .mail-body h3 { margin: 26px 0 10px; font-size: 16px; font-weight: 700; }
+    .mail-body ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; color: var(--text-secondary); font-size: 15px; }
     .mail-body li::marker { color: var(--series-1); }
-    .mail-body li b { color: var(--text-primary); }
-    .mini-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0 0 6px; }
-    @media (max-width: 640px) { .mini-kpis { grid-template-columns: repeat(2, 1fr); } }
-    .mini { background: var(--surface-2); border-radius: 10px; padding: 12px; }
-    .mini .l { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-    .mini .v { font-size: 20px; font-weight: 650; letter-spacing: -0.02em; margin-top: 2px; }
-    .mini .d { font-size: 12px; font-weight: 600; margin-top: 2px; }
-    .mini .d.good { color: var(--good-text); } .mini .d.bad { color: var(--bad-text); } .mini .d.flat { color: var(--text-muted); }
-    .guard { display: flex; gap: 12px; align-items: flex-start; background: var(--surface-2); border-radius: 12px; padding: 14px 16px; margin-top: 26px; font-size: 13.5px; color: var(--text-secondary); }
-    .guard .ic { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: rgba(12,163,12,.14); color: var(--good-text); }
-    .guard .ic.fail { background: rgba(208,59,59,.15); color: var(--bad-text); }
-    .guard .ic svg { width: 12px; height: 12px; }
-    .guard b { color: var(--text-primary); }
-    details.trace { margin-top: 12px; font-size: 13px; color: var(--text-secondary); }
-    details.trace summary { cursor: pointer; color: var(--series-1); font-weight: 500; }
-    .side-note { max-width: 760px; margin: 18px auto 0; }
+    .card.flush { padding: 0; }
+    .trace-num { font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+    .guard-head { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+    .guard-head .big { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+    .guard-head .ic { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--pill-good-bg); color: var(--good-text); }
+    .guard-head .ic.fail { background: var(--pill-bad-bg); color: var(--bad-text); }
+    .guard-head .ic svg { width: 14px; height: 14px; }
+    @media (max-width: 640px) { .mail-lead { font-size: 18px; } }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="wrap">
-      <a class="brand" href="../"><span class="brand-mark"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 11V7M7 11V3M12 11V5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>Ahmed Kassem · Data</a>
-      <nav class="topnav" aria-label="Demos">
-        <a href="../retail/">Monday Report</a>
-        <a href="../email/" aria-current="page">AI weekly email</a>
-        <a href="../spreadsheets/">Spreadsheet rescue</a>
-        <a href="../ops/">Live ops pipeline</a>
-      </nav>
-      <button class="theme-toggle" type="button" id="theme"></button>
-    </div>
-  </header>
+  <div id="topbar"></div>
 
   <main class="wrap">
-    <div class="page-head mail-shell">
-      <p class="eyebrow">Demo 2 · AI weekly summary</p>
-      <h1>The email that lands every Monday</h1>
-      <p class="lede">An AI writes the summary from facts the warehouse computed. Then a "number guard" checks every figure in the text against those facts. If even one number can't be traced, the email isn't sent.</p>
+    <div class="title-row">
+      <div>
+        <h1>Weekly AI email</h1>
+        <p class="title-sub">Every Monday an AI writes a short summary from the warehouse facts. A number guard then checks every figure in the text, and the email is only sent if all of them trace back.</p>
+      </div>
+      <div class="stamp" id="stamp"></div>
     </div>
 
-    <article class="card mail-shell" style="padding:0" aria-label="Email preview">
-      <div class="mail-meta">
-        <div class="mail-subject" id="subject"></div>
-        <div><b>From</b> Monday Report (automated) · <b>To</b> store owner · <span id="sent"></span></div>
-      </div>
-      <div class="mail-body">
-        <h2 id="headline"></h2>
-        <div class="mini-kpis" id="kpis"></div>
-        <p class="small muted" id="kpi-note" style="margin:6px 0 0"></p>
-        <h3>What happened</h3>
-        <ul id="bullets"></ul>
-        <h3>Worth a look this week</h3>
-        <ul id="watch"></ul>
-        <h3>Sales by day</h3>
-        <div class="viz" id="days"></div>
-        <h3>Biggest product moves vs last week</h3>
-        <div class="table-wrap" id="movers"></div>
-        <div class="guard" id="guard"></div>
-      </div>
-    </article>
+    <div class="grid">
+      <article class="card flush span-8" aria-label="Email preview" id="mail">
+        <div class="mail-meta">
+          <div class="mail-subject" id="subject"></div>
+          <div><b>From</b> Monday Report (automated) · <b>To</b> the store owner · <span id="sent"></span></div>
+        </div>
+        <div class="mail-body">
+          <p class="mail-lead" id="headline"></p>
+          <section id="kpis" aria-label="This week's numbers"></section>
+          <p class="small muted" id="kpi-note" style="margin:8px 0 0"></p>
+          <h3>What happened</h3>
+          <ul id="bullets"></ul>
+          <h3>Worth a look this week</h3>
+          <ul id="watch"></ul>
+          <h3>Sales by day</h3>
+          <div class="viz" id="days"></div>
+          <h3>Biggest product moves on last week</h3>
+          <div class="table-wrap" id="movers"></div>
+        </div>
+      </article>
 
-    <section class="card side-note">
-      <h3>How it works</h3>
-      <div class="flow" style="margin-top:12px">
-        <div class="step"><div class="k">1 · Facts</div><div class="t">dbt marts</div><div class="d">Last week, the week before, same week last year, movers</div></div>
-        <div class="arrow">→</div>
-        <div class="step"><div class="k">2 · Write</div><div class="t">Claude API</div><div class="d">Writes the summary from the facts file only</div></div>
-        <div class="arrow">→</div>
-        <div class="step"><div class="k">3 · Verify</div><div class="t">Number guard</div><div class="d">Every figure must match a fact, or the build fails</div></div>
-        <div class="arrow">→</div>
-        <div class="step"><div class="k">4 · Send</div><div class="t">Monday 07:00</div><div class="d">Email or Slack, on a schedule</div></div>
+      <aside class="card span-4" id="guard" aria-label="Number guard"></aside>
+    </div>
+
+    <div class="section-head"><h2>How it's built</h2><p>Runs inside the same daily pipeline</p></div>
+    <section class="card" id="built">
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Step</th><th>Tool</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Facts</strong></td><td>dbt marts</td><td>Last week, the week before and the same week last year, plus product, country and day movers, written to one JSON file</td></tr>
+            <tr><td><strong>Write</strong></td><td>Claude API</td><td>Writes the summary from the facts file only, under rules: no estimates, no causes it can't see in the data</td></tr>
+            <tr><td><strong>Verify</strong></td><td>Number guard (Python)</td><td>Pulls every amount, percentage, count and point change out of the text and matches each one to a fact; one miss fails the build</td></tr>
+            <tr><td><strong>Send</strong></td><td>Scheduler</td><td>Email or Slack at 07:00 on Monday, only after the guard passes</td></tr>
+          </tbody>
+        </table>
       </div>
-      <p class="small muted" style="margin:14px 0 0" id="written-by"></p>
+      <p class="note" id="written-by"></p>
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="wrap">
-      <span>Demo on public data by Ahmed Kassem. Not client work.</span>
-      <span>Data: Chen, D. (2019). <a href="https://archive.ics.uci.edu/dataset/502/online+retail+ii">Online Retail II</a>, UCI Machine Learning Repository, CC BY 4.0. · <a href="https://github.com/ahmedkkassem/data-portfolio">Source code</a></span>
-    </div>
-  </footer>
+  <div id="footer"></div>
+  <p id="credit" hidden>Data: Chen, D. (2019). <a href="https://archive.ics.uci.edu/dataset/502/online+retail+ii">Online Retail II</a>, UCI Machine Learning Repository, CC BY 4.0. · <a href="https://github.com/ahmedkkassem/data-portfolio">Source code</a></p>
   <script type="module" src="../assets/email.js"></script>
 </body>
 </html>

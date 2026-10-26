@@ -337,7 +337,7 @@ export function columnChart(el, opts) {
 // ---------- heatmap (sequential, one hue) ----------
 const RAMP = ["#e8f1fc", "#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"];
 const RAMP_DARK = ["#16253a", "#173055", "#184f95", "#1c5cab", "#256abf", "#3987e5", "#6da7ec", "#9ec5f4"];
-function isDark() {
+export function isDark() {
   const t = document.documentElement.dataset.theme;
   return t === "dark" || (t !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
 }
@@ -382,50 +382,25 @@ export function heatmap(el, opts) {
   });
   const sl = html("div", { class: "scale-legend" }, el);
   html("span", {}, sl, opts.lowLabel || "Low");
-  const bar = html("span", { class: "bar" }, sl);
-  bar.style.background = `linear-gradient(90deg, ${(isDark() ? RAMP_DARK : RAMP).join(",")})`;
+  const steps = html("span", { class: "steps", "aria-hidden": "true" }, sl);
+  for (const c of isDark() ? RAMP_DARK : RAMP) { const i = html("i", {}, steps); i.style.background = c; }
   html("span", {}, sl, opts.highLabel || "High");
 }
 
-// ---------- stat tile ----------
-// opts: { label, value, delta: {text, good: true|false|null}, vs, spark: [numbers], hero }
-export function statTile(parent, opts) {
-  const t = html("div", { class: `card tile${opts.hero ? " hero-tile" : ""}` }, parent);
-  html("div", { class: "label" }, t, opts.label);
-  html("div", { class: "value" }, t, opts.value);
-  if (opts.delta) {
-    const cls = opts.delta.good === true ? "good" : opts.delta.good === false ? "bad" : "flat";
-    const d = html("div", { class: `delta ${cls}` }, t);
-    html("span", {}, d, opts.delta.text);
-    if (opts.vs) html("span", { class: "vs" }, d, opts.vs);
+// ---------- KPI strip: one container split by dividers ----------
+// items: [{ label, value, delta: {text, good} | null, vs, lead }]
+export function kpiStrip(el, items) {
+  el.replaceChildren();
+  el.classList.add("kpi-strip");
+  el.style.gridTemplateColumns = `repeat(${items.length}, 1fr)`;
+  for (const k of items) {
+    const c = html("div", { class: "kpi" }, el);
+    html("div", { class: "label" }, c, k.label);
+    html("div", { class: `value${k.lead ? " lead" : ""}` }, c, k.value);
+    const d = html("div", { class: "delta" }, c);
+    if (k.delta) {
+      html("b", { class: k.delta.good === true ? "good" : k.delta.good === false ? "bad" : "flat" }, d, k.delta.text);
+      if (k.vs) d.append(` ${k.vs}`);
+    } else if (k.note) d.textContent = k.note;
   }
-  if (opts.spark && opts.spark.length > 1) {
-    const vals = opts.spark, n = vals.length, W = 200, H = 30;
-    const mn = Math.min(...vals), mx = Math.max(...vals), Y = (v) => H - 3 - ((v - mn) / (mx - mn || 1)) * (H - 6);
-    const s = svg("svg", { class: "spark", viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: "none", "aria-hidden": "true" }, t);
-    const d = vals.map((v, i) => `${i ? "L" : "M"}${((i * (W - 6)) / (n - 1) + 3).toFixed(1)},${Y(v).toFixed(1)}`).join("");
-    svg("path", { d, fill: "none", stroke: cssVar("--de-emphasis"), "stroke-width": 1.5, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round" }, s);
-    const lx = W - 3, ly = Y(vals[n - 1]);
-    const prev = vals.slice(-2);
-    svg("path", { d: `M${((n - 2) * (W - 6)) / (n - 1) + 3},${Y(prev[0])}L${lx},${ly}`, fill: "none", stroke: cssVar("--series-1"), "stroke-width": 2, "vector-effect": "non-scaling-stroke" }, s);
-  }
-  return t;
-}
-
-// ---------- theme toggle ----------
-export function initTheme(button) {
-  const root = document.documentElement;
-  const q = new URLSearchParams(location.search).get("theme");
-  let stored = null;
-  try { stored = localStorage.getItem("theme"); } catch (_) { /* storage blocked */ }
-  if (q === "dark" || q === "light") root.dataset.theme = q; else if (stored) root.dataset.theme = stored;
-  if (!button) return;
-  const paint = () => { button.textContent = isDark() ? "☀" : "☾"; button.setAttribute("aria-label", isDark() ? "Switch to light theme" : "Switch to dark theme"); };
-  paint();
-  button.addEventListener("click", () => {
-    root.dataset.theme = isDark() ? "light" : "dark";
-    try { localStorage.setItem("theme", root.dataset.theme); } catch (_) { /* ignore */ }
-    paint();
-    window.dispatchEvent(new Event("themechange"));
-  });
 }

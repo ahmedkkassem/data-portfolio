@@ -1,33 +1,50 @@
-import { html, barChart, fmtInt, initTheme, renderTable } from "./charts.js";
-import { chip, checkIcon, gbpExact } from "./common.js";
+import { html, card, barChart, kpiStrip, fmtInt } from "./charts.js";
+import { proof, checkIcon, gbpExact } from "./common.js";
+import { shell, reveal } from "./shell.js";
 
-initTheme(document.getElementById("theme"));
-await document.fonts.ready; // measure labels with the real font, not the fallback
+shell("spreadsheets");
+await document.fonts.ready;
 const [before, report, recon] = await Promise.all([
   fetch("../data/spreadsheets_before.json").then((r) => r.json()),
   fetch("../data/spreadsheets_report.json").then((r) => r.json()),
   fetch("../data/spreadsheets_recon.json").then((r) => r.json()),
 ]);
 
-const chips = document.getElementById("chips");
-chip(chips, recon.exact ? "Rebuild matches the source line for line" : "Rebuild does NOT match the source", recon.exact ? "" : "bad");
-chip(chips, `${recon.tests_passed}/${recon.tests_total} dbt tests passed`, recon.tests_passed === recon.tests_total ? "" : "bad");
-chip(chips, `${fmtInt(before.source_lines)} real lines from ${before.month}`, null);
+const totalSource = recon.rows.reduce((a, r) => a + r.source_lines, 0);
+const totalRebuilt = recon.rows.reduce((a, r) => a + r.rebuilt_lines, 0);
+const netSource = recon.rows.reduce((a, r) => a + r.source_net_revenue, 0);
+const netRebuilt = recon.rows.reduce((a, r) => a + r.rebuilt_net_revenue, 0);
+const repairs = report.fixes.reduce((a, f) => a + f.count, 0);
 
-// file cards
+const stamp = document.getElementById("stamp");
+stamp.append("Source month ");
+html("b", {}, stamp, before.month);
+const pl = document.getElementById("proofline");
+proof(pl, recon.exact ? "Rebuild matches the source line for line" : "Rebuild does not match the source", recon.exact);
+proof(pl, `${recon.tests_passed} of ${recon.tests_total} dbt tests passed`, recon.tests_passed === recon.tests_total);
+
+kpiStrip(document.getElementById("kpis"), [
+  { label: "Lines rebuilt", value: fmtInt(totalRebuilt), note: `of ${fmtInt(totalSource)} real source lines`, lead: true },
+  { label: "Lines that differ from the source", value: fmtInt(recon.mismatched_lines), note: "checked field by field, both directions" },
+  { label: "Net revenue rebuilt", value: gbpExact(netRebuilt), note: netRebuilt.toFixed(2) === netSource.toFixed(2) ? "matches the source to the penny" : `source ${gbpExact(netSource)}` },
+  { label: "Repairs made", value: fmtInt(repairs), note: `across ${report.fixes.length} kinds of problem` },
+]);
+
+// file cards: three peers in one row
 const files = document.getElementById("files");
 for (const f of before.files) {
-  const c = html("div", { class: "card file-card" }, files);
-  html("div", { class: "fname" }, c, f.name);
-  html("div", { class: "fmeta" }, c, `${f.team} · ${f.format} · ${fmtInt(f.rows_in_file)} rows · ${(f.bytes / 1024 / 1024).toFixed(1)} MB`);
+  const c = html("div", { class: "card span-4" }, files);
+  html("div", { class: "file-name" }, c, f.name);
+  html("div", { class: "file-meta" }, c, `${f.team} · ${f.format} · ${fmtInt(f.rows_in_file)} rows · ${(f.bytes / 1024 / 1024).toFixed(1)} MB`);
   const issues = [...new Set(f.sample.map((s) => s.issue).filter(Boolean))];
-  const ul = html("ul", { class: "small", style: "margin:10px 0 0;padding-left:18px;color:var(--text-secondary)" }, c);
+  const ul = html("ul", { class: "file-issues" }, c);
   issues.forEach((i) => html("li", {}, ul, i));
-  html("a", { class: "dl", href: `./files/${encodeURIComponent(f.name)}`, download: "" }, c, "Download ↓");
+  html("a", { class: "dl", href: `./files/${encodeURIComponent(f.name)}`, download: "" }, c, "Download the file");
 }
 
 // sheet preview with tabs
 const tabs = document.getElementById("tabs"), sheet = document.getElementById("sheet");
+const looksNumeric = (v) => /^-?[£$]?\d[\d.,]*( pcs)?$/.test(String(v).trim());
 function showSheet(k) {
   [...tabs.children].forEach((b, i) => b.setAttribute("aria-selected", String(i === k)));
   sheet.replaceChildren();
@@ -42,13 +59,13 @@ function showSheet(k) {
   let last = 0;
   for (const r of f.sample) {
     if (r.row > last + 1) {
-      const gap = html("tr", {}, tb);
-      html("td", { class: "rn" }, gap, "⋮");
-      html("td", { colspan: width + 1, style: "color:var(--text-muted)" }, gap, `${fmtInt(r.row - last - 1)} rows`);
+      const gap = html("tr", { class: "gap" }, tb);
+      html("td", { class: "rn" }, gap, "…");
+      html("td", { colspan: width + 1 }, gap, `${fmtInt(r.row - last - 1)} more rows`);
     }
     const tr = html("tr", { class: r.issue ? "flag" : "" }, tb);
     html("td", { class: "rn" }, tr, String(r.row));
-    for (let j = 0; j < width; j++) html("td", {}, tr, r.values[j] ?? "");
+    for (let j = 0; j < width; j++) { const v = r.values[j] ?? ""; html("td", { class: looksNumeric(v) ? "n" : "" }, tr, v); }
     html("td", { class: "why" }, tr, r.issue || "");
     last = r.row;
   }
@@ -59,65 +76,35 @@ before.files.forEach((f, k) => {
 });
 showSheet(0);
 
-// fixes
-const fx = document.getElementById("fixes");
-const head = html("div", { class: "card-head" }, fx);
-const hl = html("div", {}, head);
-html("h3", {}, hl, "Repairs made");
-html("div", { class: "sub" }, hl, "Counted by the pipeline as it cleaned");
-const fxPlot = html("div", { class: "viz" }, fx);
-barChart(fxPlot, {
-  items: report.fixes.filter((f) => f.count > 0).map((f) => ({ label: f.fix, value: f.count })),
-  format: fmtInt, valueName: "Repairs", rowHeight: 28,
-});
+// repairs + reconciliation
+const row = document.getElementById("row-fixes");
+const fx = card(row, { title: "Repairs made", sub: "Counted by the pipeline as it cleaned", spanClass: "span-7",
+  table: { columns: [{ key: "fix", label: "Repair" }, { key: "count", label: "Count", num: true, format: fmtInt }], rows: report.fixes } });
+barChart(fx.plot, { items: report.fixes.filter((f) => f.count > 0).map((f) => ({ label: f.fix, value: f.count })), format: fmtInt, valueName: "Repairs", rowHeight: 30 });
 
-const pf = document.getElementById("perfile");
-const ph = html("div", { class: "card-head" }, pf);
-const pl = html("div", {}, ph);
-html("h3", {}, pl, "Per file");
-html("div", { class: "sub" }, pl, "Rows in the file vs clean lines out");
-renderTable(html("div", { class: "table-wrap" }, pf), {
-  columns: [
-    { key: "region", label: "Team" },
-    { key: "rows_in_file", label: "Rows in file", num: true, format: fmtInt },
-    { key: "duplicates_removed", label: "Duplicates", num: true, format: fmtInt },
-    { key: "clean_lines", label: "Clean lines", num: true, format: fmtInt },
-  ],
-  rows: report.files,
-});
-
-// proof
-const proof = document.getElementById("proof");
-const totalSource = recon.rows.reduce((a, r) => a + r.source_lines, 0);
-const totalRebuilt = recon.rows.reduce((a, r) => a + r.rebuilt_lines, 0);
-const netSource = recon.rows.reduce((a, r) => a + r.source_net_revenue, 0);
-const netRebuilt = recon.rows.reduce((a, r) => a + r.rebuilt_net_revenue, 0);
-for (const p of [
-  { l: "Lines", a: fmtInt(totalSource), b: fmtInt(totalRebuilt), ok: totalSource === totalRebuilt },
-  { l: "Net revenue", a: gbpExact(netSource), b: gbpExact(netRebuilt), ok: recon.rows.every((r) => r.matches) },
-  { l: "Lines that differ in any field", a: "0 expected", b: fmtInt(recon.mismatched_lines), ok: recon.mismatched_lines === 0 },
-]) {
-  const c = html("div", { class: "card tile" }, proof);
-  html("div", { class: "label" }, c, p.l);
-  html("div", { class: "value" }, c, p.b);
-  const d = html("div", { class: `delta ${p.ok ? "good" : "bad"}` }, c);
-  const ic = html("span", { style: "display:inline-flex;width:14px;height:14px" }, d);
-  ic.append(checkIcon(p.ok));
-  html("span", {}, d, p.ok ? `matches the source (${p.a})` : `source: ${p.a}`);
+const rc = card(row, { title: "Reconciliation by team", sub: "Real source lines against lines rebuilt from the messy files", spanClass: "span-5" });
+const t = html("table", { class: "data" }, html("div", { class: "table-wrap" }, rc.plot));
+const hr = html("tr", {}, html("thead", {}, t));
+[["Team", ""], ["Lines", "num"], ["Net revenue", "num"], ["", ""]].forEach(([h, c]) => html("th", { class: c }, hr, h));
+const tb = html("tbody", {}, t);
+for (const r of recon.rows) {
+  const tr = html("tr", {}, tb);
+  html("strong", {}, html("td", {}, tr), r.region);
+  html("td", { class: "num" }, tr, `${fmtInt(r.rebuilt_lines)} of ${fmtInt(r.source_lines)}`);
+  html("td", { class: "num" }, tr, gbpExact(r.rebuilt_net_revenue));
+  const st = html("span", { class: `status ${r.matches ? "ok" : "bad"}` }, html("td", {}, tr));
+  st.append(checkIcon(r.matches));
+  st.append(r.matches ? "match" : "differs");
 }
-const rc = document.getElementById("recon");
-const rh = html("div", { class: "card-head" }, rc);
-const rl = html("div", {}, rh);
-html("h3", {}, rl, "Reconciliation by team");
-html("div", { class: "sub" }, rl, "Source = the real lines; rebuilt = what the pipeline produced from the messy files");
-renderTable(html("div", { class: "table-wrap" }, rc), {
-  columns: [
-    { key: "region", label: "Team" },
-    { key: "source_lines", label: "Source lines", num: true, format: fmtInt },
-    { key: "rebuilt_lines", label: "Rebuilt lines", num: true, format: fmtInt },
-    { key: "source_net_revenue", label: "Source net revenue", num: true, format: gbpExact },
-    { key: "rebuilt_net_revenue", label: "Rebuilt net revenue", num: true, format: gbpExact },
-    { key: "matches", label: "Match", format: (v) => (v ? "✓" : "✗") },
-  ],
-  rows: recon.rows,
-});
+const per = html("table", { class: "data", style: "margin-top:18px" }, html("div", { class: "table-wrap" }, rc.plot));
+const phr = html("tr", {}, html("thead", {}, per));
+[["File", ""], ["Rows in file", "num"], ["Pasted twice", "num"], ["Clean lines", "num"]].forEach(([h, c]) => html("th", { class: c }, phr, h));
+const ptb = html("tbody", {}, per);
+for (const f of report.files) {
+  const tr = html("tr", {}, ptb);
+  html("td", {}, tr, f.region);
+  html("td", { class: "num" }, tr, fmtInt(f.rows_in_file));
+  html("td", { class: "num" }, tr, fmtInt(f.duplicates_removed));
+  html("td", { class: "num" }, tr, fmtInt(f.clean_lines));
+}
+reveal();

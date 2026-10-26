@@ -3,56 +3,156 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ahmed Kassem: Data Portfolio</title>
-  <meta name="description" content="Data engineering demos on real public data: automated pipelines, dbt models, tests, reconciliation and dashboards, rebuilt every morning in the cloud.">
+  <title>Ahmed Kassem, Data Engineer</title>
+  <meta name="description" content="Data engineer. Pipelines that rebuild themselves every morning and check every number to the penny. Four live demos on real public data.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Ahmed Kassem, Data Engineer">
+  <meta property="og:description" content="Pipelines that rebuild themselves every morning and check every number to the penny. Four live demos on real public data.">
+  <meta property="og:image" content="https://ahmedkkassem.github.io/data-portfolio/shots/home-og.png">
+  <meta property="og:url" content="https://ahmedkkassem.github.io/data-portfolio/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/home.css">
 </head>
-<body>
-  <header class="topbar">
-    <div class="wrap">
-      <a class="brand" href="./"><span class="brand-mark"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 11V7M7 11V3M12 11V5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>Ahmed Kassem · Data</a>
-      <nav class="topnav" aria-label="Demos">
-        <a href="retail/">Monday Report</a>
-        <a href="email/">AI weekly email</a>
-        <a href="spreadsheets/">Spreadsheet rescue</a>
-        <a href="ops/">Live ops pipeline</a>
-      </nav>
-      <button class="theme-toggle" type="button" id="theme"></button>
-    </div>
-  </header>
+<body id="top">
+  <a class="skip" href="#work">Skip to the work</a>
 
-  <main class="wrap">
-    <section class="hero">
-      <p class="eyebrow">Data engineering portfolio</p>
-      <h1>Pipelines that run themselves. Numbers you can check.</h1>
-      <p class="lede">I'm Ahmed Kassem, a Google Cloud Professional Data Engineer with 10+ years in enterprise systems. These four demos run on real public data, end to end, every morning: extraction, dbt models, tests, reconciliation and publishing. All of it on free tooling, with the code open.</p>
-      <div class="meta-row">
-        <span class="chip">Google Professional Data Engineer</span>
-        <span class="chip">PMP</span>
-        <span class="chip">Azure Administrator (AZ-104)</span>
-        <span class="chip">English · Arabic · German</span>
+  <div class="pin-run">
+    <div class="pin-layer" aria-hidden="false">
+      <div class="pin-stick">
+        <h1 class="name"><span class="first">Ahmed</span><span class="second">Kassem</span></h1>
       </div>
+    </div>
+
+    <section class="panel hero" aria-label="Introduction">
+      <nav class="site-nav" aria-label="Sections">
+        <a href="#work">Work</a><a href="#about">About</a><a href="#contact">Contact</a>
+      </nav>
+      <div class="hero-copy rise">
+        <p class="lead">Data engineer. I build pipelines that rebuild themselves every morning and check every number to the penny.</p>
+        <p>Ten years in enterprise systems, Google Cloud Professional Data Engineer. The four demos below run on real public data and were rebuilt today.</p>
+        <div class="actions">
+          <a class="btn" id="cta" href="#work">See the work <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 9h11M10 4.5 14.5 9 10 13.5" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg></a>
+          <a class="link" href="https://github.com/ahmedkkassem/data-portfolio">Read the code</a>
+        </div>
+      </div>
+      <figure class="hero-shot" style="margin:0">
+        <img src="shots/hero-retail.png" width="900" height="1100" alt="The Monday Report dashboard: headline numbers and weekly revenue for a UK online shop">
+      </figure>
     </section>
 
-    <section class="projects" id="projects"></section>
+    <section class="panel receipt" id="today" aria-labelledby="today-h">
+      <div class="receipt-head rise">
+        <h2 id="today-h">Rebuilt this morning. Checked to the penny.</h2>
+        <p>Every demo below runs again each day at 06:15 UTC. These figures come from today's run, read live from its output.</p>
+      </div>
+      <div class="ledger" id="ledger">
+        <div class="rise"><b data-k="nyc">…</b><span>NYC 311 requests fetched and updated in this morning's run</span><a href="ops/">Open the pipeline</a></div>
+        <div class="rise"><b data-k="rec">…</b><span>sales figures re-calculated separately that match to the penny</span><a href="retail/">Open the dashboard</a></div>
+        <div class="rise"><b data-k="sheets">…</b><span>rebuilt spreadsheet lines that differ from the source</span><a href="spreadsheets/">Open the rescue</a></div>
+        <div class="rise"><b data-k="guard">…</b><span>numbers in the AI email traced back to the warehouse</span><a href="email/">Open the email</a></div>
+      </div>
+      <p class="ran-at" id="ran-at"></p>
+    </section>
+  </div>
 
-    <div class="section-title"><h2>How I work</h2><p>The same rules in every project</p></div>
-    <section class="principles">
-      <div class="card"><h3>Fixed scope, fixed price</h3><p>A written scope before I start, so you know the cost and the finish line. "Done" is defined as numbers that match your source systems.</p></div>
-      <div class="card"><h3>You own everything</h3><p>Pipelines run in your own cloud account (BigQuery, Looker Studio, or what you already use), with no monthly connector fees and a runbook at handover.</p></div>
-      <div class="card"><h3>Every number is tested</h3><p>Schema tests, business-rule tests and an independent reconciliation run on every refresh. If a check fails, the bad number never reaches your dashboard.</p></div>
+  <main id="work">
+    <div class="work-head">
+      <h2 class="rise">Four demos, real data</h2>
+      <p class="rise">Each one is a working pipeline you can open, with its code public. None of it is client work.</p>
+    </div>
+
+    <article class="project" aria-labelledby="p1">
+      <div class="pane left"><img src="shots/pane-retail-a.png" width="720" height="900" alt="Monday Report: headline numbers and weekly revenue" loading="lazy"></div>
+      <div class="pane right"><img src="shots/pane-retail-b.png" width="720" height="900" alt="Monday Report: customer retention by first-purchase month" loading="lazy"></div>
+      <div class="seam">
+        <div>
+          <h3 id="p1"><span class="half">Monday<br>report</span><span class="half" aria-hidden="true">Monday<br>report</span></h3>
+          <div class="meta"><strong>E-commerce KPI dashboard</strong>1.07 million real invoice lines · dbt, DuckDB and a pandas reconciliation<br><a class="link" href="retail/">Open the dashboard <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 9h11M10 4.5 14.5 9 10 13.5" stroke="currentColor" stroke-width="2"/></svg></a></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="project" aria-labelledby="p2">
+      <div class="pane left"><img src="shots/pane-email-a.png" width="720" height="900" alt="The weekly AI email" loading="lazy"></div>
+      <div class="pane right"><img src="shots/pane-email-b.png" width="720" height="900" alt="The number guard tracing each figure in the email" loading="lazy"></div>
+      <div class="seam">
+        <div>
+          <h3 id="p2"><span class="half">Weekly<br>email</span><span class="half" aria-hidden="true">Weekly<br>email</span></h3>
+          <div class="meta"><strong>AI summary with a number guard</strong>Claude writes it from warehouse facts; every figure is checked before sending<br><a class="link" href="email/">Open the email <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 9h11M10 4.5 14.5 9 10 13.5" stroke="currentColor" stroke-width="2"/></svg></a></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="project" aria-labelledby="p3">
+      <div class="pane left"><img src="shots/pane-spreadsheets-a.png" width="720" height="900" alt="Spreadsheet rescue: the proof that the rebuild is exact" loading="lazy"></div>
+      <div class="pane right"><img src="shots/pane-spreadsheets-b.png" width="720" height="900" alt="A messy team spreadsheet with its problems highlighted" loading="lazy"></div>
+      <div class="seam">
+        <div>
+          <h3 id="p3"><span class="half">Spreadsheet<br>rescue</span><span class="half" aria-hidden="true">Spreadsheet<br>rescue</span></h3>
+          <div class="meta"><strong>Three messy files, one exact table</strong>Text dates, decimal commas, subtotals and duplicates fixed; proven line by line<br><a class="link" href="spreadsheets/">Open the rescue <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 9h11M10 4.5 14.5 9 10 13.5" stroke="currentColor" stroke-width="2"/></svg></a></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="project" aria-labelledby="p4">
+      <div class="pane left"><img src="shots/pane-ops-a.png" width="720" height="900" alt="NYC 311 pipeline: headline numbers and requests per day" loading="lazy"></div>
+      <div class="pane right"><img src="shots/pane-ops-b.png" width="720" height="900" alt="NYC 311 pipeline: share of requests closed within 24 hours" loading="lazy"></div>
+      <div class="seam">
+        <div>
+          <h3 id="p4"><span class="half">NYC<br>311</span><span class="half" aria-hidden="true">NYC<br>311</span></h3>
+          <div class="meta"><strong>A live pipeline on open data</strong>Incremental loads, upserts, freshness and volume tests, every morning<br><a class="link" href="ops/">Open the pipeline <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 9h11M10 4.5 14.5 9 10 13.5" stroke="currentColor" stroke-width="2"/></svg></a></div>
+        </div>
+      </div>
+    </article>
+
+    <section aria-labelledby="stack-h">
+      <h2 id="stack-h" class="skip">The tools I build with</h2>
+      <div class="band" aria-hidden="true">
+        <div class="track" id="track"><span>Python</span><span>SQL</span><span>dbt</span><span>DuckDB</span><span>BigQuery</span><span>Looker Studio</span><span>GitHub Actions</span><span>pandas</span><span>Claude API</span></div>
+      </div>
+      <div class="band-note"><p class="rise">What I build with. These demos run on Python, dbt, DuckDB and GitHub Actions; for clients the same models run on BigQuery, with Looker Studio on top.</p></div>
+    </section>
+
+    <section class="about" id="about" aria-labelledby="about-h">
+      <h2 id="about-h" class="rise">Over ten years keeping systems up</h2>
+      <p class="intro rise">Before data engineering I spent six years at Dell Technologies as an escalation engineer: the last line of support when large customers' systems broke. I build data work the same way. Tested, documented, and boring to run.</p>
+      <div class="career">
+        <div class="rise"><b>Senior Data Solutions Engineer</b><span>Analytics-platform company · 2025 to now</span><p>Installing, tuning and troubleshooting data platforms for enterprise customers.</p></div>
+        <div class="rise"><b>Cloud Principal Engineer</b><span>Dell Technologies · 2022 to 2025</span><p>Level-4 escalation for VxRail, vSAN, VMware Cloud Foundation, Azure and OpenShift. Joined Dell in 2019 as a VxRail senior analyst.</p></div>
+        <div class="rise"><b>Network and voice engineer</b><span>Orange Business Services · 2014 to 2019</span><p>Enterprise WAN, LAN and voice platforms.</p></div>
+      </div>
+      <div class="certs rise">
+        <div><b>Google Professional Data Engineer</b><span>2025</span></div>
+        <div><b>Project Management Professional</b><span>PMP, 2024</span></div>
+        <div><b>Azure Administrator</b><span>AZ-104, 2024</span></div>
+        <div><b>English, Arabic, German</b><span>TOEFL 112 · Arabic native</span></div>
+      </div>
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="wrap">
-      <span>All demos use public data and are not client work.</span>
-      <span><a href="https://github.com/ahmedkkassem/data-portfolio">Source code on GitHub</a></span>
+  <section class="contact" id="contact" aria-labelledby="contact-h">
+    <h2 id="contact-h">Tell me where your numbers live and the three you check every week.</h2>
+    <span></span>
+    <a class="big" id="contact-line" href="https://github.com/ahmedkkassem">github.com/ahmedkkassem</a>
+    <div class="corners"><span>Based in Egypt. Working in English, Arabic and German.</span><span id="contact-links"><a href="https://github.com/ahmedkkassem/data-portfolio">Code</a></span></div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="mark" aria-hidden="true">Ahmed Kassem</div>
+    <div class="rows">
+      <div class="ways" id="ways"><a href="https://github.com/ahmedkkassem">GitHub</a></div>
+      <div class="cols">
+        <div><b>Demos</b><a href="retail/">Monday Report</a><a href="email/">Weekly AI email</a><a href="spreadsheets/">Spreadsheet rescue</a><a href="ops/">NYC 311 pipeline</a></div>
+        <div><b>Code</b><a href="https://github.com/ahmedkkassem/data-portfolio">Repository</a><a href="https://github.com/ahmedkkassem/data-portfolio/tree/main/dbt/models">dbt models</a><a href="https://github.com/ahmedkkassem/data-portfolio/actions">Pipeline runs</a></div>
+        <div><b>Data</b><a href="https://archive.ics.uci.edu/dataset/502/online+retail+ii">UCI Online Retail II</a><a href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9">NYC 311 open data</a></div>
+      </div>
     </div>
+    <div class="legal"><span>© 2026 Ahmed Kassem. The demos use public data; none of it is client work.</span><a href="#top" id="to-top">Back to top</a></div>
   </footer>
-  <script type="module" src="assets/hub.js"></script>
+  <script type="module" src="assets/home.js"></script>
 </body>
 </html>

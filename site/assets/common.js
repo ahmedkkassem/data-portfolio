@@ -19,23 +19,25 @@ export const gbp = (v) => {
 export const gbpExact = (v, d = 2) => (v == null ? "—" : `${v < 0 ? "−" : ""}£${Math.abs(v).toLocaleString("en-GB", { minimumFractionDigits: d, maximumFractionDigits: d })}`);
 
 // Signed change vs a previous value. good = whether this direction is good news.
+// Change in words: "up 12.3%" / "down 4.0%". good = whether this direction is good news (colour = good/bad).
 export function deltaPct(cur, prev, upIsGood = true) {
-  if (!prev) return { text: "—", good: null };
+  if (!prev) return { text: "no comparison", good: null };
   const ch = cur / prev - 1;
-  if (Math.abs(ch) < 0.0005) return { text: "0.0%", good: null };
-  return { text: `${ch > 0 ? "▲" : "▼"} ${Math.abs(ch * 100).toFixed(1)}%`, good: (ch > 0) === upIsGood };
+  if (Math.abs(ch) < 0.0005) return { text: "unchanged", good: null };
+  return { text: `${ch > 0 ? "up" : "down"} ${Math.abs(ch * 100).toFixed(1)}%`, good: (ch > 0) === upIsGood };
 }
 export function deltaPts(cur, prev, upIsGood = true) {
   const ch = (cur - prev) * 100;
-  if (Math.abs(ch) < 0.05) return { text: "0.0 pts", good: null };
-  return { text: `${ch > 0 ? "▲" : "▼"} ${Math.abs(ch).toFixed(1)} pts`, good: (ch > 0) === upIsGood };
+  if (Math.abs(ch) < 0.05) return { text: "unchanged", good: null };
+  return { text: `${ch > 0 ? "up" : "down"} ${Math.abs(ch).toFixed(1)} pts`, good: (ch > 0) === upIsGood };
 }
 
-export function chip(parent, text, status) {
-  const c = html("span", { class: `chip${status === "bad" ? " bad" : status === "warn" ? " warn" : ""}` }, parent);
-  if (status !== null) html("span", { class: "dot", "aria-hidden": "true" }, c);
-  html("span", {}, c, text);
-  return c;
+// One proof statement with a check (or cross) icon, for the line under a page title.
+export function proof(parent, text, ok = true) {
+  const s = html("span", { class: ok ? "ok" : "bad" }, parent);
+  s.append(checkIcon(ok));
+  html("span", { style: "color:var(--text-secondary)" }, s, text);
+  return s;
 }
 
 export function checkIcon(ok) {
