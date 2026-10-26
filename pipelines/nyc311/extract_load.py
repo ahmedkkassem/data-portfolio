@@ -24,27 +24,39 @@ PAGE = 50_000
 FIELDS = ["unique_key", "created_date", "closed_date", "agency", "complaint_type", "borough", "status"]
 
 
-def fetch(where: str) -> list[dict]:
-    rows, offset = [], 0
-    while True:
-        params = {"$select": ":updated_at," + ",".join(FIELDS), "$where": where, "$order": ":id",
-                  "$limit": PAGE, "$offset": offset}
-        url = f"{API}?{urllib.parse.urlencode(params)}"
-        for attempt in range(5):
-            try:
-                with urllib.request.urlopen(url, timeout=120) as resp:
-                    page = json.loads(resp.read())
+def fetch_page(where: str, offset: int) -> list[dict]:
+    params = {"$select": ":updated_at," + ",".join(FIELDS), "$where": where, "$order": ":id",
+              "$limit": PAGE, "$offset": offset}
+    url = f"{API}?{urllib.parse.urlencode(params)}"
+    for attempt in range(5):
+        try:
+            with urllib.request.urlopen(url, timeout=120) as resp:
+                return json.loads(resp.read())
+        except Exception as exc:  # network hiccup or throttling: back off and retry
+            if attempt == 4:
+                raise
+            print(f"retry {attempt + 1} after {exc}")
+            time.sleep(10 * (attempt + 1))
+    return []
+
+
+def fetch(where: str, window_start: dt.date, window_end: dt.date) -> list[dict]:
+    """One small query per created day (about 10K rows each) instead of deep offset paging,
+    which the API serves slowly on large result sets."""
+    rows, day = [], window_start
+    while day <= window_end:
+        nxt = day + dt.timedelta(days=1)
+        day_where = f"({where}) AND created_date >= '{day}T00:00:00' AND created_date < '{nxt}T00:00:00'"
+        offset = 0
+        while True:
+            page = fetch_page(day_where, offset)
+            rows.extend(page)
+            if len(page) < PAGE:
                 break
-            except Exception as exc:  # network hiccup or throttling: back off and retry
-                if attempt == 4:
-                    raise
-                print(f"retry {attempt + 1} after {exc}")
-                time.sleep(10 * (attempt + 1))
-        rows.extend(page)
-        print(f"  fetched {len(rows):,}")
-        if len(page) < PAGE:
-            return rows
-        offset += PAGE
+            offset += PAGE
+        day = nxt
+    print(f"  fetched {len(rows):,} rows over {(window_end - window_start).days + 1} days")
+    return rows
 
 
 def main() -> None:
@@ -61,13 +73,13 @@ def main() -> None:
         con.execute(f"insert into requests select * from '{REQUESTS}'")
         watermark = con.sql("select max(source_updated_at) from requests").fetchone()[0]
         since = (watermark - dt.timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%S")
-        mode, where = "incremental", f":updated_at > '{since}' AND created_date >= '{window_start}T00:00:00'"
+        mode, where = "incremental", f":updated_at > '{since}'"
     else:
-        mode, where = "backfill", f"created_date >= '{window_start}T00:00:00'"
+        mode, where = "backfill", "created_date IS NOT NULL"
     print(f"{mode}: {where}")
 
     before = {k for (k,) in con.sql("select unique_key from requests").fetchall()}
-    rows = fetch(where)
+    rows = fetch(where, window_start, run_at.date())
     if rows:
         tmp = STATE / "_batch.json"
         tmp.write_text("\n".join(json.dumps({
