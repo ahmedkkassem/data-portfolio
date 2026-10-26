@@ -1,0 +1,23 @@
+name: audit published figures (one-off)
+on:
+  workflow_dispatch:
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install duckdb pandas openpyxl pyarrow
+      - uses: actions/cache@v4
+        with:
+          path: data/raw/retail
+          key: retail-raw-v1
+      - run: python pipelines/retail/extract.py
+      - run: python tools/audit_published.py | tee audit.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: audit
+          path: audit.txt

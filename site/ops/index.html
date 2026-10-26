@@ -53,7 +53,7 @@
             <tr><td><strong>Extract</strong></td><td>Python, NYC Open Data API</td><td>Fetches only requests changed since the last high-water mark, one day at a time, six days in parallel</td></tr>
             <tr><td><strong>Load</strong></td><td>DuckDB</td><td>Upserts by request ID into a rolling 90-day window, so a request closed days later is updated, not missed; state kept as Parquet between runs</td></tr>
             <tr><td><strong>Transform + test</strong></td><td>dbt</td><td>Models, unique keys, no empty days, a volume check against the 28-day median, and source freshness</td></tr>
-            <tr><td><strong>Publish</strong></td><td>GitHub Pages</td><td>Only when every test passes; otherwise yesterday's page stays up and the state is not overwritten</td></tr>
+            <tr><td><strong>Publish</strong></td><td>GitHub Pages</td><td>Only when every dbt test passes; otherwise yesterday's page stays up and the state is not overwritten. A stale source is flagged on the page, not hidden</td></tr>
           </tbody>
         </table>
       </div>

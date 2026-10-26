@@ -42,7 +42,7 @@
     <div class="title-row">
       <div>
         <h1>Weekly AI email</h1>
-        <p class="title-sub">Every Monday an AI writes a short summary from the warehouse facts. A number guard then checks every figure in the text, and the email is only sent if all of them trace back.</p>
+        <p class="title-sub">An AI writes a short weekly summary from the warehouse facts, and a number guard checks every figure in it before it can go out. This shop's data ends in December 2011, so its last week never changes: the summary below was written once by Claude, and the guard checks it again on every daily build.</p>
       </div>
       <div class="stamp" id="stamp"></div>
     </div>
@@ -78,9 +78,9 @@
           <thead><tr><th>Step</th><th>Tool</th><th>What it does</th></tr></thead>
           <tbody>
             <tr><td><strong>Facts</strong></td><td>dbt marts</td><td>Last week, the week before and the same week last year, plus product, country and day movers, written to one JSON file</td></tr>
-            <tr><td><strong>Write</strong></td><td>Claude API</td><td>Writes the summary from the facts file only, under rules: no estimates, no causes it can't see in the data</td></tr>
+            <tr><td><strong>Write</strong></td><td>Claude API</td><td>Writes the summary from the facts file only, under rules: no estimates, no causes it can't see in the data. With live data it runs each Monday; here the week never changes, so it ran once</td></tr>
             <tr><td><strong>Verify</strong></td><td>Number guard (Python)</td><td>Pulls every amount, percentage, count and point change out of the text and matches each one to a fact; one miss fails the build</td></tr>
-            <tr><td><strong>Send</strong></td><td>Scheduler</td><td>Email or Slack at 07:00 on Monday, only after the guard passes</td></tr>
+            <tr><td><strong>Send</strong></td><td>Scheduler</td><td>For a client: email or Slack at 07:00 on Monday, only after the guard passes. This demo publishes this page instead of sending</td></tr>
           </tbody>
         </table>
       </div>
