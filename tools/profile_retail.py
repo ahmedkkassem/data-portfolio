@@ -7,7 +7,10 @@ con.execute("create view raw as select * from 'data/raw/retail/online_retail_ii.
 
 def show(title, sql):
     print(f"\n### {title}\n")
-    print(con.sql(sql).df().to_markdown(index=False))
+    try:
+        print(con.sql(sql).df().to_markdown(index=False))
+    except Exception as exc:  # keep profiling the rest
+        print(f"ERROR: {exc}")
 
 
 show("Rows and date range per sheet", """
@@ -18,7 +21,7 @@ show("Column types", "describe raw")
 
 show("Overlap window: rows per sheet by day where both sheets have data", """
     with b as (select min(invoice_date)::date d from raw where source_sheet = 'Year 2010-2011')
-    select invoice_date::date day, source_sheet, count(*) rows, round(sum(quantity*price),2) amount
+    select invoice_date::date as d, source_sheet, count(*) rows, round(sum(quantity*price),2) amount
     from raw, b where invoice_date::date >= b.d and invoice_date::date <= (select max(invoice_date)::date from raw where source_sheet='Year 2009-2010')
     group by all order by 1, 2""")
 
@@ -47,7 +50,7 @@ show("Lowercase-letter product codes (5 digits + letters) count", """
     where regexp_full_match(stock_code, '[0-9]{5}[a-z]{1,2}')""")
 
 show("Price decimals distribution", """
-    select case when price = round(price,2) then '<=2dp' when price = round(price,3) then '3dp' else '>3dp' end k,
+    select case when price = round(price,2) then 'le2dp' when price = round(price,3) then 'dp3' else 'gt3dp' end as k,
            count(*) rows, min(price), max(price)
     from raw group by 1""")
 
