@@ -23,7 +23,7 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt anthropic
       - name: Cache raw retail file (static source, 45 MB)
         uses: actions/cache@v4
         with:
@@ -41,6 +41,12 @@ jobs:
       - name: Export dashboard data
         if: always()
         run: python pipelines/export/retail.py
+      - name: Weekly AI summary (only with an API key)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python pipelines/summary/generate.py
+      - name: Number guard (every figure in the summary must trace to a fact)
+        run: python checks/number_guard.py
       - name: Upload build output
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,0 +1,16 @@
+{
+  "subject": "Monday Report, 28 Nov – 4 Dec 2011: revenue £306.1K, up 3.7% on last week",
+  "headline": "A solid pre-Christmas week: more orders, smaller baskets, very few returns.",
+  "bullets": [
+    "Net revenue was £306,115, up 3.7% on last week and 0.9% below the same week last year.",
+    "Orders rose 7.6% to 663, but the average order fell 4.9% to £466.64. Growth came from more customers ordering (514, up 4.5%), not from bigger baskets.",
+    "Returns were unusually low at 1.06% of sales, down 1.3 pts on last week.",
+    "Rabbit Night Light was the top product at £9,247, up £4,168 on last week. Chilli Lights fell the most, to £1,718 from £4,960.",
+    "Tuesday was the strongest day at £67,731. There were no Saturday orders (the shop rarely trades on Saturdays)."
+  ],
+  "watch": [
+    "New customers: only 31 this week, down from 37 last week and 54 in the same week last year. Worth checking acquisition before the Christmas peak.",
+    "France grew to £7,465 from £4,481, and Japan ordered £3,652 after a week with no orders. Two markets to keep an eye on."
+  ],
+  "written_by": "Claude (Anthropic), from build/site/data/report_week.json; every number checked by checks/number_guard.py"
+}

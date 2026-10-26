@@ -1,4 +1,6 @@
--- One row per Monday-to-Sunday week. Gross sales minus returns = net revenue.
+-- One row per Monday-to-Sunday week, with no gaps: weeks without sales (the shop's Christmas closures)
+-- are kept as zero rows so week-over-week and year-over-year comparisons stay aligned.
+-- Gross sales minus returns = net revenue.
 with lines as (
     select * from {{ ref('fct_retail_lines') }}
 ),
@@ -9,6 +11,12 @@ customers as (
 
 bounds as (
     select min(order_date) as first_day, max(order_date) as last_day from lines
+),
+
+spine as (
+    select cast(unnest(generate_series(
+        date_trunc('week', first_day), date_trunc('week', last_day), interval 7 day)) as date) as week_start
+    from bounds
 ),
 
 weekly as (
@@ -45,21 +53,22 @@ new_customers as (
 )
 
 select
-    weekly.week_start,
-    weekly.week_start + 6 as week_end,
-    weekly.week_start >= bounds.first_day and weekly.week_start + 6 <= bounds.last_day as is_complete_week,
-    weekly.gross_sales,
-    weekly.returns,
-    weekly.gross_sales - weekly.returns as net_revenue,
-    weekly.orders,
-    weekly.units,
-    weekly.active_customers,
+    spine.week_start,
+    spine.week_start + 6 as week_end,
+    spine.week_start >= bounds.first_day and spine.week_start + 6 <= bounds.last_day as is_complete_week,
+    coalesce(weekly.gross_sales, 0) as gross_sales,
+    coalesce(weekly.returns, 0) as returns,
+    coalesce(weekly.gross_sales, 0) - coalesce(weekly.returns, 0) as net_revenue,
+    coalesce(weekly.orders, 0) as orders,
+    coalesce(weekly.units, 0) as units,
+    coalesce(weekly.active_customers, 0) as active_customers,
     coalesce(new_customers.new_customers, 0) as new_customers,
     coalesce(by_customer_type.sales_new_customers, 0) as sales_new_customers,
     coalesce(by_customer_type.sales_returning_customers, 0) as sales_returning_customers,
     coalesce(by_customer_type.sales_guest, 0) as sales_guest
-from weekly
+from spine
 cross join bounds
+left join weekly using (week_start)
 left join by_customer_type using (week_start)
 left join new_customers using (week_start)
-order by weekly.week_start
+order by spine.week_start

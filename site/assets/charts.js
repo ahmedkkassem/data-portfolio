@@ -7,7 +7,11 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 
 export function svg(tag, attrs = {}, parent) {
   const n = document.createElementNS(SVG_NS, tag);
-  for (const [k, v] of Object.entries(attrs)) if (v !== undefined && v !== null) n.setAttribute(k, v);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v === undefined || v === null) continue;
+    // CSS custom properties are reliable as style values, not as SVG presentation attributes
+    if ((k === "fill" || k === "stroke") && String(v).includes("var(")) n.style[k] = v; else n.setAttribute(k, v);
+  }
   if (parent) parent.appendChild(n);
   return n;
 }
@@ -167,6 +171,11 @@ export function lineChart(el, opts) {
     for (const t of ticks) {
       svg("line", { x1: m.l, x2: m.l + iw, y1: Y(t), y2: Y(t), stroke: cssVar(t === 0 ? "--baseline" : "--grid"), "stroke-width": 1, "shape-rendering": "crispEdges" }, g);
       txt(g, m.l - 8, Y(t) + 4, yFormat(t), "axis-label", "end");
+    }
+    if (opts.band) {
+      const half = n > 1 ? iw / (n - 1) / 2 : 0;
+      const bx0 = Math.max(m.l, X(opts.band.from) - half), bx1 = Math.min(m.l + iw, X(opts.band.to) + half);
+      svg("rect", { x: bx0, y: m.t, width: Math.max(0, bx1 - bx0), height: ih, fill: cssVar("--accent-wash"), rx: 4 }, g);
     }
     const tickEvery = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(iw / 90))));
     for (let i = 0; i < n; i += tickEvery) txt(g, X(i), height - 6, xTick(i), "axis-label", i === 0 ? "start" : "middle");

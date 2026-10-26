@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monday Report: E-commerce Dashboard</title>
+  <meta name="description" content="An e-commerce KPI dashboard built on 1.07 million real invoice lines, with a tested dbt pipeline and penny-level reconciliation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="../"><span class="brand-mark"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 11V7M7 11V3M12 11V5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>Ahmed Kassem · Data</a>
+      <nav class="topnav" aria-label="Demos">
+        <a href="../retail/" aria-current="page">Monday Report</a>
+        <a href="../email/">AI weekly email</a>
+        <a href="../spreadsheets/">Spreadsheet rescue</a>
+        <a href="../ops/">Live ops pipeline</a>
+      </nav>
+      <button class="theme-toggle" type="button" id="theme"></button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="page-head">
+      <p class="eyebrow">Demo 1 · E-commerce KPI dashboard</p>
+      <h1>Monday Report</h1>
+      <p class="lede">One dashboard for a whole online store, built on the <strong>real</strong> transaction log of a UK online gift retailer: 1.07 million invoice lines from December 2009 to December 2011. Every number comes out of a tested dbt pipeline, and an independent script re-checks it to the penny before the page can publish.</p>
+      <div class="meta-row" id="chips"></div>
+    </div>
+
+    <div class="filters" role="group" aria-label="Reporting period">
+      <div class="seg" id="presets">
+        <button type="button" data-preset="4w" aria-pressed="false">Last 4 weeks</button>
+        <button type="button" data-preset="13w" aria-pressed="true">Last 13 weeks</button>
+        <button type="button" data-preset="52w" aria-pressed="false">Last 52 weeks</button>
+      </div>
+      <span class="note" id="window-note"></span>
+    </div>
+
+    <section class="kpis" id="kpis" aria-label="Headline numbers"></section>
+
+    <div class="section-title"><h2>Revenue</h2><p id="rev-note"></p></div>
+    <div class="grid" id="row-revenue"></div>
+
+    <div class="section-title"><h2>Products and markets</h2><p>Net revenue = sales minus returns, in the selected period</p></div>
+    <div class="grid" id="row-products"></div>
+
+    <div class="section-title"><h2>Customers</h2><p>Identified customers only (guest checkouts have no customer ID)</p></div>
+    <div class="grid" id="row-customers"></div>
+
+    <div class="section-title"><h2>Data you can trust</h2><p>Where every source row went, and the checks that guard each number</p></div>
+    <div class="grid" id="row-quality"></div>
+
+    <div class="section-title"><h2>How it's built</h2><p>Runs on GitHub Actions every morning, for free</p></div>
+    <section class="card span-12">
+      <div class="flow">
+        <div class="step"><div class="k">Source</div><div class="t">Excel workbook</div><div class="d">UCI Online Retail II, 2 sheets, 1,067,371 rows</div></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="k">Extract</div><div class="t">Python</div><div class="d">Raw rows landed untouched as Parquet, with a SHA-256 manifest</div></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="k">Transform</div><div class="t">dbt + DuckDB</div><div class="d">staging → intermediate → marts; every exclusion has a reason</div></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="k">Test</div><div class="t">dbt tests + pandas</div><div class="d">Schema tests, business rules and a second, independent implementation</div></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="k">Publish</div><div class="t">This page</div><div class="d">Small JSON files; the build fails before a wrong number ships</div></div>
+      </div>
+      <p class="small muted" style="margin:14px 0 0">In a client project the same models run on BigQuery, fed from Shopify, Stripe, GA4 or ad accounts, and the dashboard can be Looker Studio. The tests and the reconciliation stay the same.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <span>Demo on public data by Ahmed Kassem. Not client work.</span>
+      <span>Data: Chen, D. (2019). <a href="https://archive.ics.uci.edu/dataset/502/online+retail+ii">Online Retail II</a>, UCI Machine Learning Repository, CC BY 4.0. · <a href="https://github.com/ahmedkkassem/data-portfolio">Source code</a></span>
+    </div>
+  </footer>
+  <script type="module" src="../assets/retail.js"></script>
+</body>
+</html>
