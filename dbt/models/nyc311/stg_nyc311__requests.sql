@@ -7,9 +7,12 @@ select
     closed_date as closed_at,
     upper(trim(agency)) as agency,
     trim(complaint_type) as complaint_type,
-    case
-        when upper(borough) in ('BRONX', 'BROOKLYN', 'MANHATTAN', 'QUEENS') then initcap(lower(borough))
-        when upper(borough) = 'STATEN ISLAND' then 'Staten Island'
+    case upper(trim(borough))
+        when 'BRONX' then 'Bronx'
+        when 'BROOKLYN' then 'Brooklyn'
+        when 'MANHATTAN' then 'Manhattan'
+        when 'QUEENS' then 'Queens'
+        when 'STATEN ISLAND' then 'Staten Island'
         else 'Unspecified'
     end as borough,
     coalesce(status, 'Unspecified') as status,
