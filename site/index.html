@@ -24,7 +24,7 @@
       <nav aria-label="Sections">
         <a href="#work">Work</a>
         <a href="#about">About</a>
-        <a href="#contact">Contact</a>
+        <a href="#contact" class="contact-link">Contact</a>
       </nav>
       <a class="btn btn-small hire" href="#contact">Hire me</a>
     </div>
@@ -32,29 +32,34 @@
 
   <main>
     <section class="hero wrap" aria-labelledby="hero-h">
-      <div class="hero-text">
-        <h1 id="hero-h">Data pipelines that run themselves. Numbers you can trust.</h1>
+      <h1 id="hero-h"><span>Data pipelines that run themselves.</span> <span>Numbers you can trust.</span></h1>
+      <div class="hero-row">
         <p class="lead">I'm Ahmed Kassem, a Google Cloud certified data engineer with more than ten years in enterprise systems. I build automated pipelines and dashboards, and every number is tested before it reaches you.</p>
-        <div class="actions">
-          <a class="btn hire" href="#contact">Hire me</a>
-          <a class="btn btn-quiet" href="#work">See the work</a>
+        <div class="hero-side">
+          <div class="actions">
+            <a class="btn hire" href="#contact">Hire me</a>
+            <a class="btn btn-quiet" href="#work">See the work</a>
+          </div>
+          <p class="meta">Based in Egypt · English, Arabic and German</p>
         </div>
-        <p class="meta">Based in Egypt · English, Arabic and German</p>
       </div>
-      <figure class="frame hero-shot">
-        <img src="shots/demo-retail.png" width="1280" height="800" alt="The Monday Report dashboard: headline sales figures and weekly revenue for a UK online shop">
-      </figure>
+      <a class="frame hero-shot" href="retail/">
+        <picture>
+          <source media="(max-width: 640px)" srcset="shots/demo-retail-phone.png" width="390" height="700">
+          <img src="shots/demo-retail.png" width="1280" height="800" alt="The Monday Report dashboard: headline sales figures and weekly revenue for a UK online shop">
+        </picture>
+      </a>
     </section>
 
     <section class="today" aria-labelledby="today-h">
       <div class="wrap">
         <div class="today-head">
-          <h2 id="today-h">Rebuilt this morning</h2>
+          <h2 id="today-h">From the latest run</h2>
           <p id="ran-at">Every demo below runs again each day at 06:15 UTC. These figures come from the latest run.</p>
         </div>
         <dl class="figures" id="figures">
-          <div><dt>NYC requests fetched and updated in the latest run</dt><dd data-k="nyc">…</dd></div>
-          <div><dt>sales figures re-calculated separately that match to the penny</dt><dd data-k="rec">…</dd></div>
+          <div><dt>live NYC service requests kept current in a 90-day window</dt><dd data-k="nyc">…</dd></div>
+          <div><dt>sales figures re-calculated separately that match the warehouse exactly</dt><dd data-k="rec">…</dd></div>
           <div><dt>rebuilt spreadsheet lines that differ from the source</dt><dd data-k="sheets">…</dd></div>
           <div><dt>numbers in the AI email traced back to the data</dt><dd data-k="guard">…</dd></div>
         </dl>
@@ -68,13 +73,13 @@
       </div>
 
       <article class="project">
-        <a class="frame" href="retail/"><img src="shots/demo-retail.png" width="1280" height="800" loading="lazy" alt="Monday Report dashboard"></a>
+        <a class="frame" href="retail/"><img src="shots/demo-retail-customers.png" width="1280" height="800" loading="lazy" alt="Monday Report: customer retention by first-purchase month and customer segments"></a>
         <div class="project-text">
           <h3>Monday Report</h3>
           <p>An e-commerce dashboard built from the real transaction log of a UK online gift shop: revenue, products, markets, customer retention and customer segments.</p>
           <ul class="proof">
             <li>1,067,371 source rows cleaned, every excluded row given a reason</li>
-            <li>33 key figures re-calculated separately and matched to the penny</li>
+            <li>Every headline figure re-calculated separately and matched to the penny</li>
             <li>24 automated tests run on every refresh</li>
           </ul>
           <p class="stack">Python · dbt · DuckDB · pandas · GitHub Actions</p>
@@ -142,7 +147,7 @@
     <section class="about wrap" id="about" aria-labelledby="about-h">
       <div class="about-text">
         <h2 id="about-h">About</h2>
-        <p>Before data engineering I spent six years at Dell Technologies as an escalation engineer: the last line of support when large customers' systems broke. Today I'm a senior data solutions engineer at an analytics-platform company. I build data work the same way: tested, documented, and easy to run.</p>
+        <p>Before data engineering I spent six years at Dell Technologies as an escalation engineer: the last line of support when large customers' systems broke. Today I'm a senior data solutions engineer at an enterprise analytics software company. I build data work the same way: tested, documented, and easy to run.</p>
         <ul class="certs">
           <li><b>Google Professional Data Engineer</b> 2025</li>
           <li><b>Project Management Professional (PMP)</b> 2024</li>
@@ -151,21 +156,20 @@
         </ul>
       </div>
       <ol class="career">
-        <li><b>Senior Data Solutions Engineer</b><span>Analytics-platform company · 2025 to now</span><p>Installing, tuning and troubleshooting data platforms for enterprise customers.</p></li>
+        <li><b>Senior Data Solutions Engineer</b><span>Enterprise analytics software company · 2025 to now</span><p>Installing, tuning and troubleshooting data platforms for enterprise customers.</p></li>
         <li><b>Cloud Principal Engineer</b><span>Dell Technologies · 2022 to 2025</span><p>Level-4 escalation for VxRail, vSAN, VMware Cloud Foundation, Azure and OpenShift. Joined Dell in 2019 as a VxRail senior analyst.</p></li>
         <li><b>Network and voice engineer</b><span>Orange Business Services · 2014 to 2019</span><p>Enterprise WAN, LAN and voice platforms.</p></li>
       </ol>
     </section>
   </main>
 
-  <section class="contact" id="contact" aria-labelledby="contact-h">
+  <section class="contact" id="contact" aria-labelledby="contact-h" hidden>
     <div class="wrap contact-inner">
       <div>
         <h2 id="contact-h">Have numbers you don't fully trust yet?</h2>
         <p>Tell me where your data lives and the three figures you check every week. I'll reply with how I'd connect them, and a fixed price.</p>
       </div>
       <div class="contact-actions" id="contact-actions">
-        <a class="btn" id="contact-primary" href="https://github.com/ahmedkkassem/data-portfolio">See the code on GitHub</a>
       </div>
     </div>
   </section>

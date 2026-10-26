@@ -19,6 +19,10 @@ shoot() { # file url width height
 for p in retail email spreadsheets ops; do
   shoot "demo-$p" "$p/?theme=light&shot=top" 1280 800
 done
+# the Monday Report again, at its customer section, so its project picture differs from the hero
+shoot "demo-retail-customers" "retail/?theme=light&shot=row-customers" 1280 800
+# and at phone width, for the home page hero on phones
+shoot "demo-retail-phone" "retail/?theme=light&shot=top" 390 700
 # link previews (1200x630) and portfolio images
 for p in retail email spreadsheets ops; do
   shoot "$p-og"     "$p/?theme=light&shot=top" 1200 630

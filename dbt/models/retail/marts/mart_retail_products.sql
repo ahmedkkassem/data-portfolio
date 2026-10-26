@@ -1,4 +1,4 @@
--- Net revenue by product for each window (current and previous), for top lists and movers.
+-- Net revenue by product for each window (current, previous and last year), for top lists and movers.
 select
     windows.preset,
     windows.period,

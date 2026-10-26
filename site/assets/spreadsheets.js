@@ -35,7 +35,7 @@ const files = document.getElementById("files");
 for (const f of before.files) {
   const c = html("div", { class: "card span-4" }, files);
   html("div", { class: "file-name" }, c, f.name);
-  html("div", { class: "file-meta" }, c, `${f.team} · ${f.format} · ${fmtInt(f.rows_in_file)} rows · ${(f.bytes / 1024 / 1024).toFixed(1)} MB`);
+  html("div", { class: "file-meta" }, c, `${f.team} · ${f.format} · ${fmtInt(f.rows_in_file)} rows · ${f.bytes < 1024 * 1024 ? `${Math.max(1, Math.round(f.bytes / 1024))} KB` : `${(f.bytes / 1024 / 1024).toFixed(1)} MB`}`);
   const issues = [...new Set(f.sample.map((s) => s.issue).filter(Boolean))];
   const ul = html("ul", { class: "file-issues" }, c);
   issues.forEach((i) => html("li", {}, ul, i));
@@ -98,13 +98,15 @@ for (const r of recon.rows) {
 }
 const per = html("table", { class: "data", style: "margin-top:18px" }, html("div", { class: "table-wrap" }, rc.plot));
 const phr = html("tr", {}, html("thead", {}, per));
-[["File", ""], ["Rows in file", "num"], ["Pasted twice", "num"], ["Clean lines", "num"]].forEach(([h, c]) => html("th", { class: c }, phr, h));
+// every row of each file is accounted for: header and titles + subtotals and blanks + pasted twice + clean lines
+[["File", ""], ["Rows in file", "num"], ["Header and titles", "num"], ["Subtotals and blanks", "num"], ["Pasted twice", "num"], ["Clean lines", "num"]]
+  .forEach(([h, c]) => html("th", { class: c }, phr, h));
 const ptb = html("tbody", {}, per);
 for (const f of report.files) {
   const tr = html("tr", {}, ptb);
   html("td", {}, tr, f.region);
-  html("td", { class: "num" }, tr, fmtInt(f.rows_in_file));
-  html("td", { class: "num" }, tr, fmtInt(f.duplicates_removed));
-  html("td", { class: "num" }, tr, fmtInt(f.clean_lines));
+  for (const v of [f.rows_in_file, f.header_row, f.rows_in_file - f.header_row - f.duplicates_removed - f.clean_lines, f.duplicates_removed, f.clean_lines]) {
+    html("td", { class: "num" }, tr, fmtInt(v));
+  }
 }
 reveal();

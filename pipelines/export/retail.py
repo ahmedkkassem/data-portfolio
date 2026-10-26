@@ -71,7 +71,8 @@ def main() -> None:
                    coalesce(prev.net_revenue, 0) as prev_net_revenue
             from mart_retail_products cur
             left join mart_retail_products prev
-              on prev.stock_code = cur.stock_code and prev.preset = cur.preset and prev.period = 'previous'
+              on prev.stock_code = cur.stock_code and prev.preset = cur.preset
+             and prev.period = (case when cur.preset = '52w' then 'previous' else 'last_year' end)
             where cur.preset = '{preset}' and cur.period = 'current'
             order by cur.net_revenue desc limit 10""")
         for p in top:

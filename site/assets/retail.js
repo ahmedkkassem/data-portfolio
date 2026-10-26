@@ -5,7 +5,6 @@ import { shell, reveal } from "./shell.js";
 const { params } = shell("retail");
 await document.fonts.ready; // measure labels with the real font, not the fallback
 const data = await (await fetch("../data/retail.json")).json();
-const PREV = { "4w": "vs previous 4 weeks", "13w": "vs previous 13 weeks", "52w": "vs previous 52 weeks" };
 let preset = params.get("period") || "13w";
 
 // ---------- stamp + proof line (static per build) ----------
@@ -23,8 +22,10 @@ proof(pl, `${fmtInt(data.source.rows)} source rows accounted for`, true);
 
 function render() {
   document.querySelectorAll("#presets button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.preset === preset)));
-  const cur = data.periods[preset].current, prev = data.periods[preset].previous;
-  document.getElementById("window-note").textContent = `${longDate(cur.start_date)} to ${longDate(cur.end_date)}. Changes compare with the ${PREV[preset].replace("vs ", "")}.`;
+  // sales are seasonal: compare with the same weeks a year earlier (for 52 weeks, that is the previous window)
+  const cur = data.periods[preset].current, prev = data.periods[preset].last_year || data.periods[preset].previous;
+  document.getElementById("window-note").textContent =
+    `${longDate(cur.start_date)} to ${longDate(cur.end_date)}. Changes compare with the same weeks a year earlier, ${longDate(prev.start_date)} to ${longDate(prev.end_date)}.`;
   renderKpis(cur, prev);
   renderRevenue(cur);
   renderProducts();
@@ -113,7 +114,7 @@ function renderProducts() {
     title: "Top 10 products", sub: "By net revenue", spanClass: "span-6",
     table: { columns: [{ key: "name", label: "Product" }, { key: "stock_code", label: "Code" },
       { key: "units", label: "Units", num: true, format: fmtInt }, { key: "net_revenue", label: "Net revenue", num: true, format: gbpExact },
-      { key: "prev_net_revenue", label: "Previous period", num: true, format: gbpExact }], rows: prods },
+      { key: "prev_net_revenue", label: "A year earlier", num: true, format: gbpExact }], rows: prods },
   });
   barChart(p.plot, {
     items: prods.map((d) => ({ label: d.name, value: d.net_revenue, d })), format: (v) => compact(v, { prefix: "£" }),
@@ -121,7 +122,7 @@ function renderProducts() {
       { name: "Net revenue", value: gbpExact(d.net_revenue) },
       { name: "Units sold", value: fmtInt(d.units) },
       { name: "Orders", value: fmtInt(d.orders) },
-      { name: PREV[preset], value: d.prev_net_revenue ? deltaPct(d.net_revenue, d.prev_net_revenue, true).text : "new" },
+      { name: "vs a year earlier", value: d.prev_net_revenue ? deltaPct(d.net_revenue, d.prev_net_revenue, true).text : "new" },
     ],
   });
 

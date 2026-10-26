@@ -72,14 +72,16 @@ function charts() {
     tipRows: ({ c }) => [{ name: "Requests", value: fmtInt(c.requests) },
       ...["brooklyn", "queens", "bronx", "manhattan", "staten_island"].map((b) => ({ name: titleCase(b.replace("_", " ")), value: fmtInt(c[b]) }))],
   });
-  const c4 = card(rowM, { title: "Agency performance", sub: "Close times on mature days; open means not yet closed", spanClass: "span-7" });
+  // a share that rounds to 0% or 100% without being exactly that is shown with one decimal
+  const share = (v) => (v == null ? "—" : (v > 0 && v < 0.005) || (v > 0.995 && v < 1) ? fmtPct(v, 1) : fmtPct(v, 0));
+  const c4 = card(rowM, { title: "Agency performance", sub: "Requests opened in the last 28 complete days and how many are still open; close times on the 28 latest days old enough to judge", spanClass: "span-7" });
   renderTable(html("div", { class: "table-wrap" }, c4.plot), {
     columns: [
       { key: "agency", label: "Agency", format: agencyName },
       { key: "requests_28d", label: "Requests", num: true, format: fmtInt },
-      { key: "closed_within_24h_rate", label: "Closed in 24 h", num: true, format: (v) => (v == null ? "—" : fmtPct(v, 0)) },
+      { key: "closed_within_24h_rate", label: "Closed in 24 h", num: true, format: share },
       { key: "median_hours_to_close", label: "Median hours", num: true, format: (v) => (v == null ? "—" : v < 0.05 ? "under 0.1" : fmtNum(v, 1)) },
-      { key: "open_now", label: "Open now", num: true, format: fmtInt },
+      { key: "open_now", label: "Still open", num: true, format: fmtInt },
     ],
     rows: d.agencies.slice(0, 10),
   });
@@ -101,19 +103,24 @@ charts();
 
 // the pipeline
 const rowP = document.getElementById("row-pipeline");
-const c6 = card(rowP, { title: "Run history", sub: "What each scheduled run fetched and how long it took", spanClass: "span-7" });
+const c6 = card(rowP, { title: "Run history", sub: "The first full load, every scheduled run and the latest run", spanClass: "span-7" });
+// runs started by code changes during development are logged too; only the latest of them is listed
+const shown = d.runs.filter((r, i) => i === 0 || r.mode === "backfill" || r.trigger === "daily schedule").slice(0, 10);
 renderTable(html("div", { class: "table-wrap" }, c6.plot), {
   columns: [
     { key: "run_at", label: "Run (UTC)", format: (v) => `${dayMonth(v)}, ${v.slice(11, 16)}` },
-    { key: "mode", label: "Mode" },
-    { key: "rows_fetched", label: "Fetched", num: true, format: fmtInt },
+    { key: "trigger", label: "Started by", format: (v) => v || "code change" },
+    { key: "mode", label: "Mode", format: (v) => (v === "backfill" ? "full load" : v) },
+    { key: "rows_fetched", label: "Read", num: true, format: fmtInt },
     { key: "rows_new", label: "New", num: true, format: fmtInt },
-    { key: "rows_updated", label: "Updated", num: true, format: fmtInt },
+    { key: "rows_updated", label: "Changed", num: true, format: fmtInt },
     { key: "rows_in_window", label: "In window", num: true, format: fmtInt },
     { key: "duration_s", label: "Seconds", num: true, format: (v) => fmtNum(v, 0) },
   ],
-  rows: d.runs.slice(0, 10),
+  rows: shown,
 });
+html("p", { class: "note" }, c6.card, "Each run re-reads the last hour before its high-water mark, so a batch still being written at the source is never missed. " +
+  "New and Changed count only requests that really changed; re-read rows that are already up to date count as neither.");
 const c7 = card(rowP, { title: "Checks on this run", sub: "dbt tests and source freshness", spanClass: "span-5" });
 const list = html("div", { class: "checks" }, c7.plot);
 const NAMES = {

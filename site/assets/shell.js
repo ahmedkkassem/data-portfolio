@@ -51,8 +51,17 @@ export function shell(current) {
   return { params };
 }
 
-// Content is never hidden waiting for a scroll: dashboards render complete. This only marks the page
-// as ready for the screenshot tool.
+// Content is never hidden waiting for a scroll: dashboards render complete. This marks the page as ready
+// for the screenshot tool, and ?shot=<id> lifts that block (with its section heading) to just under the
+// top bar, because headless Chrome screenshots ignore scrolling.
 export function reveal() {
+  const id = new URLSearchParams(location.search).get("shot");
+  let el = id && /^[a-z-]+$/.test(id) && document.getElementById(id);
+  if (el) {
+    if (el.previousElementSibling?.classList.contains("section-head")) el = el.previousElementSibling;
+    const main = document.querySelector("main");
+    const y = el.getBoundingClientRect().top - main.getBoundingClientRect().top;
+    main.style.transform = `translateY(${-Math.max(0, y - 28)}px)`;
+  }
   document.documentElement.dataset.ready = "1";
 }

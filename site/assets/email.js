@@ -69,9 +69,19 @@ const hr = html("tr", {}, html("thead", {}, t));
 html("th", { class: "num" }, hr, "In the text");
 html("th", {}, hr, "Matches");
 const tb = html("tbody", {}, t);
-const pretty = (k) => k.replace(/_/g, " ").replace(/^this week\./, "this week: ").replace(/^last week\./, "last week: ")
-  .replace(/^same week last year\./, "same week last year: ").replace(/^(products|product gainers|product decliners|countries|days)\./, "")
-  .replace(/\.this week$/, ", this week").replace(/\.last week$/, ", last week").replace(/\.change$/, ", change");
+// a fact key in words: "change net_revenue vs last_week" -> "Net revenue, change vs last week"
+const METRIC = { net_revenue: "Net revenue", orders: "Orders", avg_order_value: "Average order", active_customers: "Customers ordering",
+  return_rate: "Return rate", new_customers: "New customers" };
+const WHEN = { this_week: "this week", last_week: "last week", same_week_last_year: "same week last year", change: "change on last week" };
+const pretty = (k) => {
+  let m = k.match(/^(change|pts) (\w+) vs (\w+)$/);
+  if (m) return `${METRIC[m[2]] ?? m[2]}, ${m[1] === "pts" ? "change in points" : "change"} vs ${WHEN[m[3]]}`;
+  m = k.match(/^(this_week|last_week|same_week_last_year)\.(\w+)$/);
+  if (m) return `${METRIC[m[2]] ?? m[2]}, ${WHEN[m[1]]}`;
+  m = k.match(/^(?:products|product_gainers|product_decliners|countries|days)\.(.+)\.(\w+)$/);
+  if (m) return `${m[1]}, ${WHEN[m[2]] ?? m[2]}`;
+  return k.replace(/_/g, " ");
+};
 const seen = new Set();
 for (const r of guard.results) {
   if (seen.has(r.number)) continue;

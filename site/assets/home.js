@@ -11,12 +11,12 @@ const target = CONTACT.upwork || (CONTACT.email && `mailto:${CONTACT.email}?subj
 if (target) {
   document.querySelectorAll("a.hire").forEach((a) => { a.href = target; if (CONTACT.upwork) a.target = "_blank"; });
   const box = document.getElementById("contact-actions");
-  box.replaceChildren();
+  document.getElementById("contact").hidden = false;
   if (CONTACT.upwork) box.append(link(CONTACT.upwork, "Hire me on Upwork", "btn"));
   if (CONTACT.email) box.append(link(`mailto:${CONTACT.email}`, CONTACT.email, CONTACT.upwork ? "btn btn-outline" : "btn"));
 } else {
-  // no contact details yet: hide "Hire me" rather than lead to a dead end
-  document.querySelectorAll("a.hire").forEach((a) => { a.hidden = true; });
+  // no contact details yet: hide "Hire me" and the contact section rather than lead to a dead end
+  document.querySelectorAll("a.hire, a.contact-link").forEach((a) => { a.hidden = true; });
 }
 
 // the latest run, read from the same files the dashboards use
@@ -25,7 +25,7 @@ const [ops, retail, recon, guard] = await Promise.all([
   get("data/ops.json"), get("data/retail.json"), get("data/spreadsheets_recon.json"), get("data/number_guard.json"),
 ]);
 const value = {
-  nyc: ops && int(ops.runs[0]?.rows_fetched ?? 0),
+  nyc: ops && int(ops.quality.requests_in_window),
   rec: retail && `${retail.reconciliation.checks.filter((c) => c.match).length} of ${retail.reconciliation.checks.length}`,
   sheets: recon && int(recon.mismatched_lines),
   guard: guard && `${guard.results.filter((r) => r.ok).length} of ${guard.numbers_checked}`,
@@ -34,5 +34,5 @@ for (const el of document.querySelectorAll("#figures dd[data-k]")) el.textConten
 if (ops) {
   const tests = ops.tests.filter((t) => t.status === "pass").length;
   document.getElementById("ran-at").textContent =
-    `Every demo runs again each day at 06:15 UTC. Latest run: ${longDate(ops.generated_at)} at ${ops.generated_at.slice(11, 16)} UTC, ${tests} of ${ops.tests.length} pipeline tests passed.`;
+    `Every demo runs again each day at 06:15 UTC. Latest run: ${longDate(ops.generated_at)} at ${ops.generated_at.slice(11, 16)} UTC, ${tests} of ${ops.tests.length} NYC pipeline tests passed.`;
 }

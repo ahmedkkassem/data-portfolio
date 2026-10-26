@@ -77,7 +77,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 table.data td.num, table.data th.num { font-variant-numeric: tabular-nums; }
 
 /* Top bar: wordmark, four plain links, theme switch */
-.topbar { background: var(--surface-1); border-bottom: 1px solid var(--border); } /* taste-skill-ignore: app-screen top bar */
+.topbar { position: relative; z-index: 5; background: var(--surface-1); border-bottom: 1px solid var(--border); } /* taste-skill-ignore: app-screen top bar */
 .topbar .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
 .brand { font-weight: 800; letter-spacing: -0.03em; color: var(--text-primary); font-size: 17px; }
 .brand:hover { text-decoration: none; }
@@ -113,7 +113,7 @@ table.data td.num, table.data th.num { font-variant-numeric: tabular-nums; }
 .filters .note { color: var(--text-muted); font-size: 14px; }
 
 /* Grid + panels: one gutter, quiet borders */
-.grid { display: grid; gap: var(--gap); grid-template-columns: repeat(12, 1fr); align-items: stretch; }
+.grid { display: grid; gap: var(--gap); grid-template-columns: repeat(12, 1fr); align-items: start; } /* a short card keeps its own height */
 .span-12 { grid-column: span 12; } .span-8 { grid-column: span 8; } .span-7 { grid-column: span 7; }
 .span-6 { grid-column: span 6; } .span-5 { grid-column: span 5; } .span-4 { grid-column: span 4; }
 @media (max-width: 1000px) { .span-8, .span-7, .span-6, .span-5, .span-4 { grid-column: span 12; } }
