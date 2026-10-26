@@ -15,16 +15,10 @@ shoot() { # file url width height
     --virtual-time-budget=20000 --window-size="$3,$4" --screenshot="shots/$1.png" "http://localhost:8765/$2" >/dev/null 2>&1 || true
   echo "shot $1"
 }
-# home-page crops: two per demo, dark, 4:5 portrait (720x900)
-shoot pane-retail-a        "retail/?theme=dark&shot=kpis"        720 900
-shoot pane-retail-b        "retail/?theme=dark&shot=cohorts"     720 900
-shoot pane-email-a         "email/?theme=dark&shot=mail"         720 900
-shoot pane-email-b         "email/?theme=dark&shot=guard"        720 900
-shoot pane-spreadsheets-a  "spreadsheets/?theme=dark&shot=kpis"  720 900
-shoot pane-spreadsheets-b  "spreadsheets/?theme=dark&shot=preview" 720 900
-shoot pane-ops-a           "ops/?theme=dark&shot=kpis"           720 900
-shoot pane-ops-b           "ops/?theme=dark&shot=speed"          720 900
-shoot hero-retail          "retail/?theme=light&shot=top"        900 1100
+# the home page shows each dashboard as it looks at the top of its page, in the light theme
+for p in retail email spreadsheets ops; do
+  shoot "demo-$p" "$p/?theme=light&shot=top" 1280 800
+done
 # link previews (1200x630) and portfolio images
 for p in retail email spreadsheets ops; do
   shoot "$p-og"     "$p/?theme=light&shot=top" 1200 630
@@ -35,6 +29,6 @@ for p in retail email spreadsheets ops; do
 done
 shoot home-og     "?shot=1" 1200 630
 shoot index-cover "?shot=1" 1440 1080
-shoot index-full  "?shot=1" 1440 7000
+shoot index-full  "?shot=1" 1440 5600
 shoot index-mobile "?shot=1" 390 3200
 ls shots | wc -l

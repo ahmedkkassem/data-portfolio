@@ -51,20 +51,8 @@ export function shell(current) {
   return { params };
 }
 
-// Panels rise once as they scroll into view; called after a page has rendered its content.
-export function reveal(selector = ".card, .kpi-strip, .proofline") {
-  const els = [...document.querySelectorAll(selector)];
-  if (!("IntersectionObserver" in window)) return;
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-  }, { rootMargin: "0px 0px -8% 0px" });
-  els.forEach((el, i) => { el.classList.add("reveal"); el.style.transitionDelay = `${(i % 3) * 70}ms`; io.observe(el); });
-  // headless screenshots: ?shot=<element id> scrolls there and shows everything at once
-  const shot = new URLSearchParams(location.search).get("shot");
-  if (shot) {
-    els.forEach((el) => { el.classList.add("in"); el.style.transition = "none"; });
-    document.documentElement.style.scrollBehavior = "auto";
-    const target = document.getElementById(shot);
-    if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 16, behavior: "instant" });
-  }
+// Content is never hidden waiting for a scroll: dashboards render complete. This only marks the page
+// as ready for the screenshot tool.
+export function reveal() {
+  document.documentElement.dataset.ready = "1";
 }
