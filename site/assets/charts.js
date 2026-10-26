@@ -116,7 +116,7 @@ export function renderTable(wrap, { columns, rows }) {
     const row = html("tr", {}, tb);
     for (const col of columns) {
       const v = r[col.key];
-      html("td", { class: col.num ? "num" : "" }, row, col.format ? col.format(v, r) : v ?? "—");
+      html("td", { class: col.num ? "num" : "" }, row, col.format ? col.format(v) : v ?? "—");
     }
   }
 }
@@ -160,13 +160,17 @@ export function lineChart(el, opts) {
     const yMin = opts.yMin ?? Math.min(0, ...all), yMax = Math.max(...all);
     const ticks = niceTicks(yMin, yMax, 4);
     const root = svg("svg", { width: W, height, role: "img", "aria-label": opts.ariaLabel || "line chart" }, host);
+    const ih = height - 10 - 26;
+    const Y = (v) => 10 + ih - ((v - ticks[0]) / (ticks.at(-1) - ticks[0])) * ih;
+    // end labels only when they don't collide; otherwise legend + tooltip carry identity and no space is reserved
+    const endYs = series.map((s) => { const v = s.values.filter((u) => u != null).at(-1); return Y(v); }).sort((a, b) => a - b);
+    const labelsFit = endLabels && !endYs.some((y, k) => k && y - endYs[k - 1] < 15);
     const leftPad = Math.max(...ticks.map((t) => measure(root, yFormat(t), "axis-label"))) + 10;
-    const rightPad = endLabels ? Math.min(150, Math.max(...series.map((s) => measure(root, s.name, "end-label"))) + 22) : 12;
+    const rightPad = labelsFit ? Math.min(150, Math.max(...series.map((s) => measure(root, s.name, "end-label"))) + 22) : 12;
     const m = { t: 10, r: rightPad, b: 26, l: leftPad };
-    const iw = W - m.l - m.r, ih = height - m.t - m.b;
+    const iw = Math.max(10, W - m.l - m.r);
     const n = x.length;
     const X = (i) => m.l + (n === 1 ? iw / 2 : (i * iw) / (n - 1));
-    const Y = (v) => m.t + ih - ((v - ticks[0]) / (ticks.at(-1) - ticks[0])) * ih;
     const g = svg("g", {}, root);
     for (const t of ticks) {
       svg("line", { x1: m.l, x2: m.l + iw, y1: Y(t), y2: Y(t), stroke: cssVar(t === 0 ? "--baseline" : "--grid"), "stroke-width": 1, "shape-rendering": "crispEdges" }, g);
@@ -198,11 +202,7 @@ export function lineChart(el, opts) {
       return { s, i, y: Y(s.values[i]) };
     });
     for (const e of ends) svg("circle", { cx: X(e.i), cy: e.y, r: 4, fill: e.s.color, stroke: cssVar("--surface-1"), "stroke-width": 2 }, g);
-    if (endLabels) {
-      const sorted = [...ends].sort((a, b) => a.y - b.y);
-      const collide = sorted.some((e, k) => k && e.y - sorted[k - 1].y < 15);
-      if (!collide) for (const e of ends) txt(g, X(e.i) + 10, e.y + 4, e.s.name, "end-label");
-    }
+    if (labelsFit) for (const e of ends) txt(g, X(e.i) + 10, e.y + 4, e.s.name, "end-label");
     // crosshair layer
     const cross = svg("line", { y1: m.t, y2: m.t + ih, stroke: cssVar("--axis-muted"), "stroke-width": 1, opacity: 0, "shape-rendering": "crispEdges" }, g);
     const dots = series.map((s) => svg("circle", { r: 4, fill: s.color, stroke: cssVar("--surface-1"), "stroke-width": 2, opacity: 0 }, g));
@@ -296,7 +296,7 @@ export function columnChart(el, opts) {
     const root = svg("svg", { width: W, height, role: "img", "aria-label": opts.ariaLabel || "column chart" }, host);
     const leftPad = Math.max(...ticks.map((t) => measure(root, format(t), "axis-label"))) + 10;
     const m = { t: 10, r: 8, b: 26, l: leftPad };
-    const iw = W - m.l - m.r, ih = height - m.t - m.b, n = x.length;
+    const iw = Math.max(10, W - m.l - m.r), ih = height - m.t - m.b, n = x.length;
     const band = iw / n, cw = Math.max(2, Math.min(24, band * 0.62));
     const Y = (v) => m.t + ih - (v / ticks.at(-1)) * ih;
     for (const t of ticks) {

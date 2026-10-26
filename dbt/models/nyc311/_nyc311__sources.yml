@@ -1,0 +1,33 @@
+version: 2
+sources:
+  - name: nyc311
+    description: >
+      NYC 311 service requests (NYC Open Data, dataset erm2-nwe9), last 90 days, kept current by
+      pipelines/nyc311/extract_load.py. Timestamps are New York local time as published.
+    meta:
+      external_location: "data/state/{name}.parquet"
+    tables:
+      - name: nyc311_requests
+        loaded_at_field: source_updated_at
+        freshness:
+          warn_after: {count: 36, period: hour}
+          error_after: {count: 72, period: hour}
+      - name: nyc311_runs
+models:
+  - name: stg_nyc311__requests
+    columns:
+      - name: unique_key
+        data_tests: [unique, not_null]
+      - name: created_at
+        data_tests: [not_null]
+      - name: borough
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [Bronx, Brooklyn, Manhattan, Queens, Staten Island, Unspecified]
+              config:
+                severity: warn
+  - name: mart_nyc311_daily
+    columns:
+      - name: day
+        data_tests: [unique, not_null]

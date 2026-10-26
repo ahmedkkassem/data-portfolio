@@ -4,6 +4,7 @@ import {
 import { checkIcon, chip, gbp, gbpExact, shortDate, longDate, monthLabel, deltaPct, deltaPts } from "./common.js";
 
 initTheme(document.getElementById("theme"));
+await document.fonts.ready; // measure labels with the real font, not the fallback
 const data = await (await fetch("../data/retail.json")).json();
 const PRESET_LABEL = { "4w": "previous 4 weeks", "13w": "previous 13 weeks", "52w": "previous 52 weeks" };
 let preset = new URLSearchParams(location.search).get("period") || "13w";
@@ -189,7 +190,7 @@ function renderCustomers() {
   const seg = card(row, { title: "Customer segments", sub: `Recency and frequency as of ${longDate(data.data_last_day)}`, spanClass: "span-7" });
   const wrap = html("div", { class: "table-wrap" }, seg.card);
   seg.plot.remove();
-  const t = html("table", { class: "data" }, wrap);
+  const t = html("table", { class: "data rfm" }, wrap);
   const hr = html("tr", {}, html("thead", {}, t));
   ["Segment", "Customers", "Share of customers vs share of revenue", "Revenue per customer", "Median days since last order"].forEach((h2, i) =>
     html("th", { class: i === 0 || i === 2 ? "" : "num" }, hr, h2));
@@ -225,7 +226,7 @@ function renderCustomers() {
 }
 function shareBar(v, max, color, what) {
   const row = html("div", { style: "display:flex;align-items:center;gap:8px;margin:2px 0" });
-  const track = html("div", { style: "flex:1;max-width:220px;height:8px;position:relative" }, row);
+  const track = html("div", { style: "flex:1;min-width:60px;max-width:150px;height:8px;position:relative" }, row);
   const bar = html("div", { style: `position:absolute;left:0;top:0;height:8px;border-radius:0 4px 4px 0;width:${(v / max) * 100}%;background:${color}` }, track);
   bar.setAttribute("aria-hidden", "true");
   html("span", { style: "min-width:40px;text-align:right;color:var(--text-primary);font-weight:600;font-size:12px" }, row, fmtPct(v, 0));

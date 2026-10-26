@@ -48,6 +48,27 @@ jobs:
           dbt build --project-dir dbt --profiles-dir dbt --select tag:sheets
           cp dbt/target/run_results.json build/checks/run_results_sheets.json
           python pipelines/export/sheets.py
+      - name: Restore NYC 311 pipeline state (GitHub Release asset)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download pipeline-state -p '*.parquet' -D data/state || echo "no saved state yet; this run backfills"
+      - name: Extract + load NYC 311 (incremental upsert)
+        run: python pipelines/nyc311/extract_load.py
+      - name: Transform + test NYC 311 (dbt build + source freshness)
+        run: |
+          dbt build --project-dir dbt --profiles-dir dbt --select tag:nyc311
+          cp dbt/target/run_results.json build/checks/run_results_nyc311.json
+          dbt source freshness --project-dir dbt --profiles-dir dbt --select source:nyc311.nyc311_requests \
+            --output build/checks/nyc311_sources.json || echo "freshness threshold breached; shown on the page"
+          python pipelines/export/nyc311.py
+      - name: Save NYC 311 pipeline state (only after tests pass)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view pipeline-state >/dev/null 2>&1 || gh release create pipeline-state \
+            --title "Pipeline state (NYC 311)" \
+            --notes "Machine-written state for the daily NYC 311 pipeline (Parquet). Not a software release."
+          gh release upload pipeline-state data/state/nyc311_requests.parquet data/state/nyc311_runs.parquet --clobber
       - name: Weekly AI summary (only with an API key)
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

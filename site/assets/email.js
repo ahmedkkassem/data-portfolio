@@ -2,6 +2,7 @@ import { html, columnChart, compact, fmtInt, fmtPct, initTheme, renderTable } fr
 import { checkIcon, gbp, gbpExact, longDate, dayMonth, deltaPct, deltaPts } from "./common.js";
 
 initTheme(document.getElementById("theme"));
+await document.fonts.ready; // measure labels with the real font, not the fallback
 const [facts, summary, guard] = await Promise.all([
   fetch("../data/report_week.json").then((r) => r.json()),
   fetch("./summary.json").then((r) => r.json()),

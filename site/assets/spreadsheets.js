@@ -2,6 +2,7 @@ import { html, barChart, fmtInt, initTheme, renderTable } from "./charts.js";
 import { chip, checkIcon, gbpExact } from "./common.js";
 
 initTheme(document.getElementById("theme"));
+await document.fonts.ready; // measure labels with the real font, not the fallback
 const [before, report, recon] = await Promise.all([
   fetch("../data/spreadsheets_before.json").then((r) => r.json()),
   fetch("../data/spreadsheets_report.json").then((r) => r.json()),
