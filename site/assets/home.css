@@ -84,7 +84,7 @@ p { margin: 0; }
 .project .meta strong { display: block; font-size: var(--step-lead); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
 .project .meta .link { margin-top: 18px; color: #ffffff; }
 @supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 641px) {
     .project .pane.left, .project h3 .half { animation: tear-up linear both; animation-timeline: --project; animation-range: cover 0% cover 100%; }
     .project .pane.right, .project h3::after { animation: tear-down linear both; animation-timeline: --project; animation-range: cover 0% cover 100%; }
   }
