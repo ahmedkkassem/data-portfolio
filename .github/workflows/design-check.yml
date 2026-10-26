@@ -1,0 +1,41 @@
+name: design check
+# Runs the taste-skill inspector (github.com/Leonxlnx/taste-skill, pinned) against the live site in a real
+# browser at 1440, 768 and 390 px, plus its source linter. Pages use the page rules, dashboards the
+# app-screen rules. Report and screenshots are uploaded as an artifact.
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [build]
+    types: [completed]
+jobs:
+  inspect:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Fetch taste-skill (pinned)
+        run: |
+          git clone -q https://github.com/Leonxlnx/taste-skill.git /tmp/taste
+          git -C /tmp/taste checkout -q 12af471f627f866411b4bd785b19646d3672784c
+      - name: Lint the source
+        continue-on-error: true
+        run: node /tmp/taste/skills/taste-skill/scripts/lint.mjs site | tee lint.txt
+      - name: Inspect the live pages
+        continue-on-error: true
+        run: |
+          BASE=https://ahmedkkassem.github.io/data-portfolio
+          node /tmp/taste/skills/taste-skill/scripts/inspect.mjs "$BASE/?v=$GITHUB_RUN_ID" --out taste/hub | tee taste-hub.txt || true
+          for p in retail email spreadsheets ops; do
+            node /tmp/taste/skills/taste-skill/scripts/inspect.mjs "$BASE/$p/?v=$GITHUB_RUN_ID" --app --out taste/$p | tee taste-$p.txt || true
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: design-check
+          path: |
+            lint.txt
+            taste-*.txt
+            taste/
