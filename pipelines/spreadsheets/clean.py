@@ -75,7 +75,7 @@ def parse_date(v, cfg, fixes):
     for fmt in DATE_FORMATS[cfg["day_first"]]:
         try:
             parsed = dt.datetime.strptime(str(v).strip(), fmt)
-            fixes["Dates stored as text, parsed with the team's date order"] += 1
+            fixes["Text dates parsed (team date order)"] += 1
             return parsed
         except ValueError:
             continue
@@ -88,7 +88,7 @@ def parse_price(v, cfg, fixes):
     else:
         s = str(v).strip()
         if s.startswith("£"):
-            fixes["Prices typed as text with a £ sign"] += 1
+            fixes['Prices typed as "£2.55"'] += 1
             s = s[1:]
         if cfg["decimal_comma"]:
             if "." in s:
@@ -107,7 +107,7 @@ def parse_qty(v, fixes):
     if not m:
         raise ValueError(f"unparseable quantity {v!r}")
     if m.group(2):
-        fixes['Quantities typed with units ("12 pcs")'] += 1
+        fixes['Quantities like "12 pcs"'] += 1
     return int(m.group(1))
 
 
@@ -116,11 +116,11 @@ def parse_customer(v, fixes):
         return None
     s = str(v).strip()
     if s.upper() in {"N/A", "NA", "-", "NONE"}:
-        fixes['Missing customers written as "N/A" or "-"'] += 1
+        fixes['Missing customers as "N/A" or "-"'] += 1
         return None
     digits = re.sub(r"\.0$", "", s)
     if not digits.isdigit():
-        fixes['Customer IDs with prefixes ("C-12583")'] += 1
+        fixes["Customer IDs with prefixes"] += 1
         digits = re.sub(r"\D", "", digits)
     return digits
 
@@ -129,7 +129,7 @@ def clean_file(name, cfg, fixes, stats):
     rows = read_rows(IN / name)
     h = find_header(rows)
     if h:
-        fixes["Title rows above the header skipped"] += h
+        fixes["Title rows skipped"] += h
     header = [str(c).strip().lower() if c is not None else "" for c in rows[h]]
     col = {}
     for canon, aliases in HEADER_ALIASES.items():
@@ -148,10 +148,10 @@ def clean_file(name, cfg, fixes, stats):
             continue
         code_clean = str(code).strip().upper()
         if code_clean != str(code):
-            fixes["Product codes trimmed or upper-cased"] += 1
+            fixes["Codes trimmed or upper-cased"] += 1
         qty = parse_qty(get("quantity"), fixes)
         if "type" in col and str(get("type")).strip().lower() == "return" and qty > 0:
-            fixes["Returns stored as positive quantities, sign flipped"] += 1
+            fixes["Return signs flipped"] += 1
             qty = -qty
         country = str(get("country")).strip()
         if country in COUNTRY_ALIASES:
@@ -173,12 +173,12 @@ def clean_file(name, cfg, fixes, stats):
         if "line_total" in col and get("line_total") not in (None, ""):
             stated = Decimal(str(get("line_total"))).quantize(Decimal("0.001"))
             if stated != (price * qty).quantize(Decimal("0.001")):
-                fixes["Line totals that disagree with qty × price"] += 1
+                fixes["Line totals ≠ qty × price"] += 1
         out.append(rec)
     df = pd.DataFrame(out)
     key = ["invoice", "line", "invoiced_at", "stock_code", "quantity", "unit_price", "customer_id", "country"]
     dupes = int(df.duplicated(subset=key).sum())
-    fixes["Rows pasted twice, removed"] += dupes
+    fixes["Pasted-twice rows removed"] += dupes
     df = df.drop_duplicates(subset=key)
     stats.append({"file": name, "region": cfg["region"], "rows_in_file": len(rows), "header_row": h + 1,
                   "clean_lines": len(df), "duplicates_removed": dupes,

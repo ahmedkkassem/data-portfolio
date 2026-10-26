@@ -80,7 +80,6 @@ renderTable(html("div", { class: "table-wrap" }, pf), {
   columns: [
     { key: "region", label: "Team" },
     { key: "rows_in_file", label: "Rows in file", num: true, format: fmtInt },
-    { key: "header_row", label: "Header on row", num: true },
     { key: "duplicates_removed", label: "Duplicates", num: true, format: fmtInt },
     { key: "clean_lines", label: "Clean lines", num: true, format: fmtInt },
   ],
