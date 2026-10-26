@@ -1,0 +1,14 @@
+version: 2
+sources:
+  - name: retail
+    description: >
+      UCI Online Retail II (CC BY 4.0): every line of every invoice of a UK online gift retailer,
+      1 Dec 2009 – 9 Dec 2011, as two Excel sheets. Landed untouched by pipelines/retail/extract.py.
+    meta:
+      external_location: "data/raw/retail/{name}.parquet"
+    tables:
+      - name: online_retail_ii
+        columns:
+          - name: source_sheet
+          - name: source_row
+            description: Excel row number in the source sheet (row 1 is the header).

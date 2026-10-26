@@ -1,0 +1,54 @@
+version: 2
+models:
+  - name: int_retail__lines_classified
+    description: Every source line with the one reason it is excluded from sales (null = included).
+    columns:
+      - name: exclusion_reason
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [overlap_copy, exact_duplicate, non_product, zero_or_negative_price, zero_quantity, quantity_sign_mismatch]
+  - name: dim_retail_products
+    columns:
+      - name: stock_code
+        data_tests: [unique, not_null]
+  - name: dim_retail_customers
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+  - name: fct_retail_lines
+    description: Clean product sales and returns. Sales have quantity > 0, returns quantity < 0, all prices > 0.
+    columns:
+      - name: invoice
+        data_tests: [not_null]
+      - name: order_date
+        data_tests: [not_null]
+      - name: line_amount
+        data_tests: [not_null]
+      - name: country
+        data_tests: [not_null]
+      - name: line_kind
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [sale, return]
+      - name: stock_code
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_retail_products')
+                field: stock_code
+  - name: mart_retail_weekly
+    columns:
+      - name: week_start
+        data_tests: [unique, not_null]
+  - name: mart_retail_periods
+    data_tests:
+      - dbt_utils_free_unique_combination:
+          arguments:
+            columns: [preset, period]
+  - name: mart_retail_rfm
+    columns:
+      - name: segment
+        data_tests: [unique, not_null]

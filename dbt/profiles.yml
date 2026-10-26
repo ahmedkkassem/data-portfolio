@@ -1,0 +1,7 @@
+portfolio:
+  target: ci
+  outputs:
+    ci:
+      type: duckdb
+      path: warehouse.duckdb
+      threads: 4

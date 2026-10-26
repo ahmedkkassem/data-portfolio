@@ -1,0 +1,19 @@
+stock_code,category,description
+POST,shipping,Postage
+DOT,shipping,Dotcom postage
+C2,shipping,Carriage
+C3,shipping,Carriage
+M,manual_adjustment,Manual entry
+ADJUST,manual_adjustment,Manual adjustment
+ADJUST2,manual_adjustment,Manual adjustment
+B,manual_adjustment,Bad debt write-off
+PADS,manual_adjustment,Placeholder line priced at 0.001
+D,discount,Discount
+S,samples,Samples
+BANK CHARGES,fees,Bank charges
+AMAZONFEE,fees,Amazon marketplace fee
+CRUK,fees,Charity commission
+TEST001,test,Test product
+TEST002,test,Test product
+GIFT,gift_voucher,Gift voucher
+GIFT_*,gift_voucher,Gift vouchers (any code starting GIFT_)

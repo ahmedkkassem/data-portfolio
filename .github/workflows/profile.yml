@@ -1,9 +1,7 @@
 name: profile (one-off)
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [tools/profile_retail.py, pipelines/retail/extract.py, .github/workflows/profile.yml]
+  # push trigger removed: profiling is a one-off
 jobs:
   profile:
     runs-on: ubuntu-latest

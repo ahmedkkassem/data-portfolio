@@ -1,0 +1,29 @@
+name: portfolio
+version: "1.0.0"
+config-version: 2
+profile: portfolio
+
+model-paths: [models]
+seed-paths: [seeds]
+test-paths: [tests]
+macro-paths: [macros]
+target-path: target
+clean-targets: [target]
+
+models:
+  portfolio:
+    +materialized: table
+    retail:
+      staging:
+        +materialized: view
+    nyc311:
+      staging:
+        +materialized: view
+
+seeds:
+  portfolio:
+    +quote_columns: false
+    retail_non_product_codes:
+      +column_types: {stock_code: varchar, category: varchar, description: varchar}
+    retail_country_names:
+      +column_types: {source_country: varchar, country: varchar, region: varchar}

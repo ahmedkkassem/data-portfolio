@@ -1,0 +1,51 @@
+name: build
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "15 6 * * *"   # daily 06:15 UTC
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: build
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Cache raw retail file (static source, 45 MB)
+        uses: actions/cache@v4
+        with:
+          path: data/raw/retail
+          key: retail-raw-v1
+      - name: Extract retail
+        run: python pipelines/retail/extract.py
+      - name: Transform + test (dbt build)
+        working-directory: .
+        run: |
+          dbt deps --project-dir dbt --profiles-dir dbt || true
+          dbt build --project-dir dbt --profiles-dir dbt
+      - name: Independent reconciliation
+        run: python checks/reconcile_retail.py
+      - name: Export dashboard data
+        if: always()
+        run: python pipelines/export/retail.py
+      - name: Upload build output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: |
+            build/
+            dbt/target/run_results.json
