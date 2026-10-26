@@ -74,7 +74,8 @@ for (const el of document.querySelectorAll("#ledger b[data-k]")) {
   const v = values[el.dataset.k];
   if (!v) { el.textContent = "—"; continue; }
   if (v.sub) el.nextElementSibling.textContent = v.sub;
-  if (reduce || v.n === 0) { el.textContent = v.text(v.n); continue; }
+  // only a plain count animates; "N of M" figures appear final at once, so a half-way frame never reads as a failed check
+  if (reduce || v.n === 0 || el.dataset.k !== "nyc") { el.textContent = v.text(v.n); continue; }
   // count up once when the receipt comes into view; the final figure is always the exact one
   el.textContent = v.text(0);
   el.dataset.target = v.n;

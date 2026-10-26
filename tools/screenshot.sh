@@ -24,7 +24,7 @@ shoot pane-spreadsheets-a  "spreadsheets/?theme=dark&shot=kpis"  720 900
 shoot pane-spreadsheets-b  "spreadsheets/?theme=dark&shot=preview" 720 900
 shoot pane-ops-a           "ops/?theme=dark&shot=kpis"           720 900
 shoot pane-ops-b           "ops/?theme=dark&shot=speed"          720 900
-shoot hero-retail          "retail/?theme=light&shot=kpis"       900 1100
+shoot hero-retail          "retail/?theme=light&shot=top"        900 1100
 # link previews (1200x630) and portfolio images
 for p in retail email spreadsheets ops; do
   shoot "$p-og"     "$p/?theme=light&shot=top" 1200 630

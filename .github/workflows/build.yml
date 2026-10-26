@@ -80,6 +80,10 @@ jobs:
           cp -R site/. build/site/
           cp build/checks/number_guard.json build/site/data/number_guard.json
           touch build/site/.nojekyll
+          # cache-busting: every build gets fresh CSS/JS URLs, so no visitor mixes old and new files
+          V=${GITHUB_SHA::8}
+          find build/site -name '*.html' -exec sed -i -E "s#(assets/[a-z]+\.(css|js))\"#\1?v=$V\"#g" {} +
+          find build/site -name '*.js' -exec sed -i -E "s#from \"(\./|\.\./)([a-z]+)\.js\"#from \"\1\2.js?v=$V\"#g" {} +
       - name: Screenshots (headless Chrome)
         run: bash tools/screenshot.sh
       - name: Upload build output
