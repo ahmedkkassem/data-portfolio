@@ -21,16 +21,15 @@ jobs:
           path: data/raw/retail
           key: retail-raw-v1
       - run: python pipelines/retail/extract.py
-      - name: Replay plan (dry run)
-        run: |
-          python pipelines/shop/replay.py --dry-run | tee replay.txt
-          python pipelines/shop/replay.py --dry-run --day 2026-11-29 | tail -1 | tee -a replay.txt
       - name: Models on offer (free tier)
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://models.github.ai/catalog/models \
-            | python -c "import json,sys; [print(m['id'], '|', m.get('rate_limit_tier')) for m in json.load(sys.stdin)]" | tee models.txt
+          curl -s -i -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
+            https://models.github.ai/catalog/models | head -c 3000 | tee models.txt; echo
+          curl -s -i -X POST https://models.github.ai/inference/chat/completions \
+            -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" \
+            -d '{"model":"openai/gpt-4.1-mini","messages":[{"role":"user","content":"Say OK"}]}' | head -c 2000 | tee -a models.txt
       - name: Free model writes the summary; the number guard checks it
         env:
           GITHUB_TOKEN: ${{ github.token }}
