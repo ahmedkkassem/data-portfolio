@@ -24,7 +24,7 @@ proof(pl, `${fmtInt(data.source.rows)} source rows accounted for`, true);
 function render() {
   document.querySelectorAll("#presets button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.preset === preset)));
   const cur = data.periods[preset].current, prev = data.periods[preset].previous;
-  document.getElementById("window-note").textContent = `${longDate(cur.start_date)} to ${longDate(cur.end_date)}, Monday to Sunday weeks`;
+  document.getElementById("window-note").textContent = `${longDate(cur.start_date)} to ${longDate(cur.end_date)}. Changes compare with the ${PREV[preset].replace("vs ", "")}.`;
   renderKpis(cur, prev);
   renderRevenue(cur);
   renderProducts();
@@ -32,7 +32,7 @@ function render() {
 
 // ---------- KPI strip ----------
 function renderKpis(cur, prev) {
-  const vs = PREV[preset];
+  const vs = "";
   kpiStrip(document.getElementById("kpis"), [
     { label: "Net revenue", value: gbp(cur.net_revenue), delta: deltaPct(cur.net_revenue, prev.net_revenue, true), vs, lead: true },
     { label: "Orders", value: fmtInt(cur.orders), delta: deltaPct(cur.orders, prev.orders, true), vs },
