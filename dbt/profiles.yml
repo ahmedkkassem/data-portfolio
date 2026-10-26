@@ -3,5 +3,5 @@ portfolio:
   outputs:
     ci:
       type: duckdb
-      path: warehouse.duckdb
+      path: dbt/warehouse.duckdb  # relative to the repo root, where dbt runs
       threads: 4
