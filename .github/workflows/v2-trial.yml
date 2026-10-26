@@ -1,11 +1,10 @@
 name: v2 trial (one-off)
 # Checks the parts of portfolio v2 that need no accounts: the order replay plan, and a free model on
-# GitHub Models writing the weekly summary, with the number guard on its output.
+# the Gemini API free tier writing the weekly summary, with the number guard on its output.
 on:
   workflow_dispatch:
 permissions:
   contents: read
-  models: read
 jobs:
   trial:
     runs-on: ubuntu-latest
@@ -21,18 +20,9 @@ jobs:
           path: data/raw/retail
           key: retail-raw-v1
       - run: python pipelines/retail/extract.py
-      - name: Models on offer (free tier)
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          curl -s -i -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-            https://models.github.ai/catalog/models | head -c 3000 | tee models.txt; echo
-          curl -s -i -X POST https://models.github.ai/inference/chat/completions \
-            -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" \
-            -d '{"model":"openai/gpt-4.1-mini","messages":[{"role":"user","content":"Say OK"}]}' | head -c 2000 | tee -a models.txt
       - name: Free model writes the summary; the number guard checks it
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           mkdir -p trial
           curl -sf https://ahmedkkassem.github.io/data-portfolio/data/report_week.json -o trial/facts.json
@@ -44,7 +34,5 @@ jobs:
         with:
           name: v2-trial
           path: |
-            replay.txt
-            models.txt
             build/shop/
             trial/
