@@ -139,7 +139,7 @@ def main() -> None:
                      else rows_updated end,
                 rows_in_window, window_start, max_created, max_source_updated, duration_s, 'code change'
                 from '{RUNS}'""")
-    runs.execute("insert into runs values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", list(run.values()))
+    runs.execute(f"insert into runs values ({", ".join("?" * len(run))})", list(run.values()))
     runs.execute(f"copy runs to '{RUNS}' (format parquet)")
     print(json.dumps(run, indent=1))
 
