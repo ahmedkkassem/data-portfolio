@@ -15,7 +15,8 @@ if (target) {
   if (CONTACT.upwork) box.append(link(CONTACT.upwork, "Hire me on Upwork", "btn"));
   if (CONTACT.email) box.append(link(`mailto:${CONTACT.email}`, CONTACT.email, CONTACT.upwork ? "btn btn-outline" : "btn"));
 } else {
-  document.querySelectorAll("a.hire").forEach((a) => { a.href = "#contact"; });
+  // no contact details yet: hide "Hire me" rather than lead to a dead end
+  document.querySelectorAll("a.hire").forEach((a) => { a.hidden = true; });
 }
 
 // the latest run, read from the same files the dashboards use

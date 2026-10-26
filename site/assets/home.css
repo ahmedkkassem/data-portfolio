@@ -22,7 +22,7 @@ a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 img { display: block; max-width: 100%; height: auto; }
-h1, h2, h3 { color: var(--ink); margin: 0; letter-spacing: -0.025em; }
+h1, h2, h3 { color: var(--ink); margin: 0; letter-spacing: -0.025em; line-height: 1.15; }
 p { margin: 0; }
 .wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
 @media (max-width: 640px) { .wrap { padding: 0 20px; } }
@@ -48,8 +48,8 @@ p { margin: 0; }
 @media (max-width: 640px) { .nav nav { display: none; } .nav .hire { margin-left: auto; } }
 
 /* Hero */
-.hero { display: grid; grid-template-columns: 5fr 7fr; gap: 56px; align-items: center; padding-top: 72px; padding-bottom: 80px; }
-.hero h1 { font-size: clamp(36px, 2.2rem + 1.6vw, 56px); line-height: 1.06; font-weight: 800; letter-spacing: -0.035em; }
+.hero { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; padding-top: 72px; padding-bottom: 80px; }
+.hero h1 { font-size: clamp(34px, 1.9rem + 1.4vw, 50px); line-height: 1.08; font-weight: 800; letter-spacing: -0.035em; }
 .hero .lead { margin-top: 20px; font-size: 19px; color: var(--text); max-width: 34em; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .hero .meta { margin-top: 20px; font-size: 15px; color: var(--muted); }
