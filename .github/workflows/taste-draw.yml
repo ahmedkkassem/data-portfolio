@@ -1,0 +1,21 @@
+name: taste draw
+# Deals art directions with taste-skill's draw.mjs (pinned). Output is in the job log.
+on:
+  workflow_dispatch:
+    inputs:
+      args:
+        description: arguments for draw.mjs
+        required: true
+jobs:
+  draw:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: |
+          git clone -q https://github.com/Leonxlnx/taste-skill.git /tmp/taste
+          git -C /tmp/taste checkout -q 12af471f627f866411b4bd785b19646d3672784c
+      - env:
+          ARGS: ${{ github.event.inputs.args }}
+        run: eval "node /tmp/taste/skills/taste-skill/scripts/draw.mjs $ARGS"
