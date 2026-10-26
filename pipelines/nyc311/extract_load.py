@@ -12,6 +12,7 @@ import pathlib
 import time
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 import duckdb
 
@@ -40,22 +41,26 @@ def fetch_page(where: str, offset: int) -> list[dict]:
     return []
 
 
+def fetch_day(where: str, day: dt.date) -> list[dict]:
+    nxt = day + dt.timedelta(days=1)
+    day_where = f"({where}) AND created_date >= '{day}T00:00:00' AND created_date < '{nxt}T00:00:00'"
+    rows, offset = [], 0
+    while True:
+        page = fetch_page(day_where, offset)
+        rows.extend(page)
+        if len(page) < PAGE:
+            return rows
+        offset += PAGE
+
+
 def fetch(where: str, window_start: dt.date, window_end: dt.date) -> list[dict]:
-    """One small query per created day (about 10K rows each) instead of deep offset paging,
-    which the API serves slowly on large result sets."""
-    rows, day = [], window_start
-    while day <= window_end:
-        nxt = day + dt.timedelta(days=1)
-        day_where = f"({where}) AND created_date >= '{day}T00:00:00' AND created_date < '{nxt}T00:00:00'"
-        offset = 0
-        while True:
-            page = fetch_page(day_where, offset)
-            rows.extend(page)
-            if len(page) < PAGE:
-                break
-            offset += PAGE
-        day = nxt
-    print(f"  fetched {len(rows):,} rows over {(window_end - window_start).days + 1} days")
+    """One small query per created day (about 10K rows each), six at a time, instead of deep offset
+    paging, which the API serves slowly on large result sets."""
+    days = [window_start + dt.timedelta(days=i) for i in range((window_end - window_start).days + 1)]
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        per_day = list(pool.map(lambda d: fetch_day(where, d), days))
+    rows = [r for day_rows in per_day for r in day_rows]
+    print(f"  fetched {len(rows):,} rows over {len(days)} days")
     return rows
 
 
