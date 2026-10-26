@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spreadsheet Rescue</title>
+  <meta name="description" content="Three teams' messy sales spreadsheets rebuilt into one clean table, proven exact line by line.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .files { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 900px) { .files { grid-template-columns: 1fr; } }
+    .file-card .fname { font-weight: 600; font-size: 14px; word-break: break-all; }
+    .file-card .fmeta { color: var(--text-muted); font-size: 12.5px; margin-top: 2px; }
+    .file-card a.dl { display: inline-flex; margin-top: 10px; font-size: 13px; font-weight: 600; }
+    .sheet { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+    .sheet table { border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; min-width: 100%; }
+    .sheet td, .sheet th { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 4px 8px; white-space: nowrap; color: var(--text-secondary); }
+    .sheet th { background: var(--surface-2); color: var(--text-muted); font-weight: 600; position: sticky; top: 0; }
+    .sheet td.rn { background: var(--surface-2); color: var(--axis-muted); text-align: right; width: 1%; }
+    .sheet tr.flag td:not(.rn) { background: rgba(250, 178, 25, 0.13); }
+    .sheet tr.flag td.why { color: var(--text-primary); font-weight: 500; }
+    .sheet td.why { border-right: 0; color: var(--text-muted); font-style: normal; }
+    .tabs { display: flex; gap: 2px; background: var(--surface-2); border: 1px solid var(--border); padding: 3px; border-radius: 10px; width: fit-content; margin-bottom: 12px; flex-wrap: wrap; }
+    .tabs button { border: 0; background: transparent; font: 500 13px var(--font); color: var(--text-secondary); padding: 6px 12px; border-radius: 7px; cursor: pointer; }
+    .tabs button[aria-selected="true"] { background: var(--surface-1); color: var(--text-primary); font-weight: 600; box-shadow: 0 1px 2px rgba(11,11,11,.08); }
+    .big-proof { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 900px) { .big-proof { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="../"><span class="brand-mark"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 11V7M7 11V3M12 11V5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>Ahmed Kassem · Data</a>
+      <nav class="topnav" aria-label="Demos">
+        <a href="../retail/">Monday Report</a>
+        <a href="../email/">AI weekly email</a>
+        <a href="../spreadsheets/" aria-current="page">Spreadsheet rescue</a>
+        <a href="../ops/">Live ops pipeline</a>
+      </nav>
+      <button class="theme-toggle" type="button" id="theme"></button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="page-head">
+      <p class="eyebrow">Demo 3 · Spreadsheet rescue</p>
+      <h1>Three messy team spreadsheets → one table you can trust</h1>
+      <p class="lede" id="lede">Three sales teams each keep a monthly file their own way. The pipeline reads all three, fixes what's wrong, and proves line by line that nothing was lost, changed or counted twice.</p>
+      <div class="meta-row" id="chips"></div>
+    </div>
+
+    <div class="section-title"><h2>Before: the files as the teams keep them</h2><p>Download them and look for yourself</p></div>
+    <div class="files" id="files"></div>
+
+    <section class="card" style="margin-top:16px">
+      <div class="card-head"><div><h3>Inside the files</h3><div class="sub">The first rows, plus one example of each problem (highlighted)</div></div></div>
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div class="sheet" id="sheet"></div>
+    </section>
+
+    <div class="section-title"><h2>What the pipeline fixed</h2><p>Every repair is counted</p></div>
+    <div class="grid">
+      <section class="card span-7" id="fixes"></section>
+      <section class="card span-5" id="perfile"></section>
+    </div>
+
+    <div class="section-title"><h2>After: proof it's exact</h2><p>Compared with the real source lines the files were built from</p></div>
+    <div class="big-proof" id="proof"></div>
+    <section class="card" style="margin-top:16px" id="recon"></section>
+
+    <div class="section-title"><h2>How it's built</h2><p>Re-runs on every build</p></div>
+    <section class="card">
+      <div class="flow">
+        <div class="step"><div class="k">Files</div><div class="t">2 × Excel, 1 × CSV</div><div class="d">Different layouts, formats and habits per team</div></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="k">Parse</div><div class="t">Python</div><div class="d">Finds the header, maps columns, parses dates and numbers per team format</div></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="k">Fix</div><div class="t">Generic rules</div><div class="d">Subtotals, blanks, duplicates, codes, countries, return signs</div></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="k">Prove</div><div class="t">dbt test</div><div class="d">Field-by-field match with the source, both directions</div></div>
+      </div>
+      <p class="small muted" style="margin:14px 0 0">The files are generated from the real November 2011 lines of the <a href="../retail/">Monday Report</a> data, with common spreadsheet problems planted on purpose, so there is a known right answer to check against. With a client's real files, the same checks compare against their accounting or order totals.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <span>Demo on public data by Ahmed Kassem. Not client work.</span>
+      <span>Data: Chen, D. (2019). <a href="https://archive.ics.uci.edu/dataset/502/online+retail+ii">Online Retail II</a>, UCI Machine Learning Repository, CC BY 4.0. · <a href="https://github.com/ahmedkkassem/data-portfolio">Source code</a></span>
+    </div>
+  </footer>
+  <script type="module" src="../assets/spreadsheets.js"></script>
+</body>
+</html>

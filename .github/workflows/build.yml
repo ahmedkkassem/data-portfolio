@@ -35,18 +35,32 @@ jobs:
         working-directory: .
         run: |
           dbt deps --project-dir dbt --profiles-dir dbt || true
-          dbt build --project-dir dbt --profiles-dir dbt
+          dbt build --project-dir dbt --profiles-dir dbt --exclude tag:sheets tag:nyc311
       - name: Independent reconciliation
         run: python checks/reconcile_retail.py
       - name: Export dashboard data
         if: always()
         run: python pipelines/export/retail.py
+      - name: Spreadsheet rescue (make messy files, clean them, prove the rebuild is exact)
+        run: |
+          python pipelines/spreadsheets/make_messy.py
+          python pipelines/spreadsheets/clean.py
+          dbt build --project-dir dbt --profiles-dir dbt --select tag:sheets
+          cp dbt/target/run_results.json build/checks/run_results_sheets.json
+          python pipelines/export/sheets.py
       - name: Weekly AI summary (only with an API key)
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python pipelines/summary/generate.py
       - name: Number guard (every figure in the summary must trace to a fact)
         run: python checks/number_guard.py
+      - name: Assemble site
+        run: |
+          cp -R site/. build/site/
+          cp build/checks/number_guard.json build/site/data/number_guard.json
+          touch build/site/.nojekyll
+      - name: Screenshots (headless Chrome)
+        run: bash tools/screenshot.sh
       - name: Upload build output
         if: always()
         uses: actions/upload-artifact@v4
@@ -55,3 +69,16 @@ jobs:
           path: |
             build/
             dbt/target/run_results.json
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

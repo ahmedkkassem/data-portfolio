@@ -16,9 +16,10 @@ models:
     retail:
       staging:
         +materialized: view
+    sheets:
+      +tags: [sheets]
     nyc311:
-      staging:
-        +materialized: view
+      +tags: [nyc311]
 
 seeds:
   portfolio:

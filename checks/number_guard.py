@@ -14,7 +14,7 @@ SUMMARY = json.loads(pathlib.Path("site/email/summary.json").read_text())
 OUT = pathlib.Path("build/checks/number_guard.json")
 
 MONTHS = "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec"
-TOKEN = re.compile(r"(?P<cur>£)?(?P<num>\d[\d,]*(?:\.\d+)?)(?P<scale>[KM])?(?P<unit>%| pts)?")
+TOKEN = re.compile(r"(?P<cur>£)?(?P<num>\d(?:[\d,]*\d)?(?:\.\d+)?)(?P<scale>[KM])?(?P<unit>%| pts)?")
 
 
 def candidates():
